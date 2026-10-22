@@ -137,9 +137,9 @@ img { max-width: 100%; }
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px max(clamp(14px, 3vw, 32px), calc((100% - 1200px) / 2));
+  padding: 16px max(clamp(14px, 3vw, 32px), calc((100% - 1200px) / 2));
 }
-.hdr-bar.compact { padding-top: 10px; padding-bottom: 10px; }
+.hdr-bar.compact { padding-top: 12px; padding-bottom: 12px; }
 .hdr-link-solicitud {
   display: inline-block;
   font-size: 15px;
@@ -334,4 +334,36 @@ a.btn-anim:active, button.btn-anim:active, .btn-anim:active {
 /* Column radius defaults */
 button, input, select, textarea, .card-col {
   border-radius: var(--radius-ui);
+}
+
+/* ---- Reveal + botones (prioridad final) ---- */
+.reveal {
+  opacity: 0 !important;
+  transform: translateY(32px) !important;
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+.reveal.in {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+.lift {
+  transition: box-shadow 0.25s ease, transform 0.25s ease !important;
+}
+.lift:hover {
+  box-shadow: 0 12px 28px rgba(0, 51, 102, 0.14) !important;
+  transform: translateY(-4px) !important;
+}
+a.btn-anim:hover, button.btn-anim:hover, .btn-anim:hover {
+  transform: translateY(-3px) scale(1.02) !important;
+  box-shadow: 0 10px 24px rgba(0, 51, 102, 0.16) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .reveal.in {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .lift:hover, .btn-anim:hover {
+    transform: none !important;
+  }
 }

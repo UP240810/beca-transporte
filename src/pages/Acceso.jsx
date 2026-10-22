@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   GraduationCap, ShieldCheck, Wallet, Bus, ChevronRight, FileSpreadsheet,
@@ -15,39 +15,90 @@ const accesos = [
   { to: "/transportistas/login", icon: ShieldCheck, t: "Admin transportistas", d: "Viajes por chofer y unidad.", color: C.garnet },
 ];
 
+function Reveal({ children, delay = 0, style }) {
+  const ref = useRef(null);
+  const [visto, setVisto] = useState(
+    typeof IntersectionObserver === "undefined" ||
+      (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)
+  );
+
+  useEffect(() => {
+    if (visto || !ref.current) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setVisto(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.08, rootMargin: "0px 0px -4% 0px" }
+    );
+    io.observe(ref.current);
+    return () => io.disconnect();
+  }, [visto]);
+
+  return (
+    <div
+      ref={ref}
+      className={`reveal${visto ? " in" : ""}`}
+      style={{ transitionDelay: `${delay}ms`, ...style }}
+    >
+      {children}
+    </div>
+  );
+}
+
 export default function Acceso() {
   return (
     <div className="page-shell" style={{ background: C.paper, fontFamily: "var(--font-sans)", color: C.ink }}>
       <GovHeader compact />
       <main style={{ maxWidth: 960, margin: "0 auto", padding: "clamp(24px, 5vw, 44px) clamp(16px, 4vw, 24px) 48px" }}>
-        <h1 style={{ fontSize: "clamp(26px, 4vw, 32px)", fontWeight: 800, color: C.navy, margin: "0 0 8px" }}>Accesos al sistema</h1>
-        <p style={{ fontSize: 16.5, color: "#6b7785", marginBottom: 24 }}>
-          Elige el área que te corresponde. También puedes abrir este menú desde las tres rayas del encabezado.
-        </p>
+        <Reveal>
+          <h1 style={{ fontSize: "clamp(26px, 4vw, 32px)", fontWeight: 700, color: C.navy, margin: "0 0 8px", letterSpacing: "-0.02em" }}>
+            Accesos al sistema
+          </h1>
+          <p style={{ fontSize: 16.5, color: "#6b7785", marginBottom: 24 }}>
+            Elige el área que te corresponde. También puedes abrir este menú desde las tres rayas del encabezado.
+          </p>
+        </Reveal>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(300px, 100%), 1fr))", gap: 12 }}>
-          {accesos.map((o) => (
-            <Link
-              key={o.to}
-              to={o.to}
-              style={{
-                display: "flex", alignItems: "center", gap: 14,
-                background: "#fff", borderRadius: 14, padding: "16px 16px",
-                textDecoration: "none", border: `1px solid ${C.paperDim}`,
-                boxShadow: "0 4px 12px rgba(0,51,102,0.05)",
-              }}
-            >
-              <div style={{
-                width: 44, height: 44, borderRadius: 12, background: `${o.color}18`,
-                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-              }}>
-                <o.icon size={20} color={o.color === C.gold ? C.navy : o.color} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 17.5, fontWeight: 750, color: C.navy }}>{o.t}</div>
-                <div style={{ fontSize: 14.5, color: "#6b7785", marginTop: 2 }}>{o.d}</div>
-              </div>
-              <ChevronRight size={18} color="#8993A1" />
-            </Link>
+          {accesos.map((o, i) => (
+            <Reveal key={o.to} delay={i * 80}>
+              <Link
+                to={o.to}
+                className="lift btn-anim"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 14,
+                  background: "#fff",
+                  borderRadius: 8,
+                  padding: "16px 16px",
+                  textDecoration: "none",
+                  border: `1px solid ${C.paperDim}`,
+                  boxShadow: "rgba(18,22,30,0.024) 0px 1px 4px 0px, rgba(18,22,30,0.05) 0px 1px 0px 0px, rgba(18,22,30,0.024) 0px 0px 0px 1px",
+                  height: "100%",
+                }}
+              >
+                <div style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 8,
+                  background: `${o.color}18`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}>
+                  <o.icon size={20} color={o.color === C.gold ? C.navy : o.color} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 17.5, fontWeight: 650, color: C.navy }}>{o.t}</div>
+                  <div style={{ fontSize: 14.5, color: "#6b7785", marginTop: 2 }}>{o.d}</div>
+                </div>
+                <ChevronRight size={18} color="#8993A1" />
+              </Link>
+            </Reveal>
           ))}
         </div>
       </main>

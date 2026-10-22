@@ -37,7 +37,7 @@ export function GovHeader({ compact = false }) {
             <BrandLogos
               variant="municipio"
               onDark
-              height={compact ? "clamp(80px, 12vw, 104px)" : "clamp(96px, 14vw, 128px)"}
+              height={compact ? "clamp(100px, 15vw, 140px)" : "clamp(120px, 18vw, 168px)"}
             />
           </Link>
 
