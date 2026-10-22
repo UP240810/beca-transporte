@@ -186,16 +186,22 @@ export function GovFooter({ flush = false }) {
           <div>
             <div style={titulo}>ATENCIÓN</div>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <div style={{
-                background: "rgba(255,255,255,0.1)",
-                borderRadius: 12,
-                padding: "12px 16px",
-                fontSize: 14.5,
-                lineHeight: 1.35,
-              }}>
-                <div style={{ fontWeight: 800, fontSize: 21, color: C.gold }}>Presidencia</div>
-                Ventanilla de cobros
-              </div>
+              <Link
+                to="/ayuda"
+                style={{
+                  background: "rgba(255,255,255,0.1)",
+                  borderRadius: 8,
+                  padding: "12px 16px",
+                  fontSize: 14.5,
+                  lineHeight: 1.35,
+                  color: "#fff",
+                  textDecoration: "none",
+                  display: "block",
+                }}
+              >
+                <div style={{ fontWeight: 800, fontSize: 18, color: C.gold }}>Reportar un problema</div>
+                En la app · formulario de ayuda
+              </Link>
             </div>
           </div>
         </div>
@@ -207,10 +213,19 @@ export function GovFooter({ flush = false }) {
           color: "rgba(255,255,255,0.78)",
           fontSize: 13.5,
           padding: "14px clamp(16px, 4vw, 28px)",
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 12,
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
         <span>© {new Date().getFullYear()} H. Ayuntamiento de Calvillo</span>
-        <span>Sistema Digital de Beca de Transporte Estudiantil</span>
+        <span style={{ display: "flex", flexWrap: "wrap", gap: "8px 16px" }}>
+          <Link to="/terminos" style={{ color: "rgba(255,255,255,0.85)", textDecoration: "none" }}>Términos y condiciones</Link>
+          <Link to="/privacidad" style={{ color: "rgba(255,255,255,0.85)", textDecoration: "none" }}>Aviso de privacidad</Link>
+          <Link to="/cookies" style={{ color: "rgba(255,255,255,0.85)", textDecoration: "none" }}>Política de cookies</Link>
+        </span>
       </div>
     </footer>
   );

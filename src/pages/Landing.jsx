@@ -131,7 +131,7 @@ function Hero() {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
             {[
               { icon: MapPin, t: "Rutas locales", d: "Origen → destino" },
-              { icon: Wallet, t: "40% estudiante", d: "Subsidio municipal" },
+              { icon: Wallet, t: "60% descuento", d: "A estudiantes" },
               { icon: Smartphone, t: "Pase digital", d: "QR en el celular" },
               { icon: Bus, t: "En la combi", d: "Validación rápida" },
             ].map(({ icon: Icon, t, d }) => (
@@ -153,7 +153,7 @@ function ComoFunciona() {
     { icon: FileText, t: "Llena tu solicitud", d: "Datos, escuela y de dónde a dónde viajas, con documentos PDF." },
     { icon: ShieldCheck, t: "Revisión municipal", d: "Desarrollo Social valida y asigna ruta y precio del boleto." },
     { icon: Smartphone, t: "Recibe tu acceso", d: "Usuario, contraseña y pase QR en tu cuenta de estudiante." },
-    { icon: Wallet, t: "Recarga y viaja", d: "Paga el 40% en ventanilla y valida el pase con el chofer." },
+    { icon: Wallet, t: "Recarga y viaja", d: "Paga el 40% restante en ventanilla y valida el pase con el chofer." },
   ];
   return (
     <section style={{ maxWidth: 1200, margin: "0 auto", padding: "clamp(32px, 6vw, 56px) clamp(16px, 4vw, 28px)" }}>

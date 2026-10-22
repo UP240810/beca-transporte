@@ -106,7 +106,7 @@ function Select({ value, onChange, options, placeholder }) {
 
 function Section({ title, icon: Icon, children }) {
   return (
-    <div style={{ background: "#fff", border: `1px solid ${C.paperDim}`, borderRadius: 14, padding: 16, marginBottom: 14 }}>
+    <div style={{ background: "#fff", border: `1px solid ${C.paperDim}`, borderRadius: 8, padding: 16, marginBottom: 14, boxShadow: "0 1px 4px rgba(18,22,30,0.04)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
         {Icon && <Icon size={15} color={C.navy} />}
         <div className="f-display" style={{ fontSize: 17.6, fontWeight: 700, color: C.navy }}>{title}</div>
@@ -151,6 +151,9 @@ export default function Solicitud() {
   const [foto, setFoto] = useState(null);
   const [comprimiendoFoto, setComprimiendoFoto] = useState(false);
   const [errorFoto, setErrorFoto] = useState("");
+  const [paso, setPaso] = useState(0);
+  const [aceptaTerminos, setAceptaTerminos] = useState(false);
+  const [aceptaPrivacidad, setAceptaPrivacidad] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [enviado, setEnviado] = useState(false);
   const [folio, setFolio] = useState("");
@@ -233,53 +236,95 @@ export default function Solicitud() {
     reader.readAsDataURL(archivo);
   }
 
-  function validarCliente() {
+  const PASOS = [
+    "Datos del solicitante",
+    "Trayectos",
+    "Datos familiares",
+    "Ingresos y egresos",
+    "Datos de la vivienda",
+    "Discapacidad",
+    "Documentos y envío",
+  ];
+
+  function validarPaso(p) {
     const errs = {};
     const msgs = [];
     const dig = (s) => String(s || "").replace(/\D/g, "");
 
-    if (!form.nombre.trim()) { errs.nombre = true; msgs.push("Nombre obligatorio"); }
-    if (!form.apellidos.trim()) { errs.apellidos = true; msgs.push("Apellidos obligatorios"); }
-    if (!form.direccion.trim()) { errs.direccion = true; msgs.push("Dirección obligatoria"); }
-    if (!form.coloniaLocalidad.trim()) { errs.coloniaLocalidad = true; msgs.push("Colonia / localidad obligatoria"); }
-    if (dig(form.telefono).length !== 10) { errs.telefono = true; msgs.push("Teléfono: 10 dígitos"); }
-    if (dig(form.celular).length !== 10) { errs.celular = true; msgs.push("Celular: 10 dígitos"); }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.correo.trim())) { errs.correo = true; msgs.push("Correo inválido"); }
-    if (!form.escuela) { errs.escuela = true; msgs.push("Selecciona institución"); }
-    if (!form.carrera.trim()) { errs.carrera = true; msgs.push("Carrera obligatoria"); }
-    if (!form.grado) { errs.grado = true; msgs.push("Selecciona grado"); }
-    if (!form.matricula.trim()) { errs.matricula = true; msgs.push("Matrícula obligatoria"); }
-
-    for (let i = 0; i < numRutas; i++) {
-      const t = trayectos[i];
-      if (!t?.origen?.trim() || !t?.destino?.trim()) {
-        errs[`trayecto${i}`] = true;
-        msgs.push(`Completa origen y destino del trayecto ${i + 1}`);
+    if (p === 0) {
+      if (!form.nombre.trim()) { errs.nombre = true; msgs.push("Nombre obligatorio"); }
+      if (!form.apellidos.trim()) { errs.apellidos = true; msgs.push("Apellidos obligatorios"); }
+      if (!form.direccion.trim()) { errs.direccion = true; msgs.push("Dirección obligatoria"); }
+      if (!form.coloniaLocalidad.trim()) { errs.coloniaLocalidad = true; msgs.push("Colonia / localidad obligatoria"); }
+      if (dig(form.telefono).length !== 10) { errs.telefono = true; msgs.push("Teléfono: 10 dígitos"); }
+      if (dig(form.celular).length !== 10) { errs.celular = true; msgs.push("Celular: 10 dígitos"); }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.correo.trim())) { errs.correo = true; msgs.push("Correo inválido"); }
+      if (!form.escuela) { errs.escuela = true; msgs.push("Selecciona institución"); }
+      if (!form.carrera.trim()) { errs.carrera = true; msgs.push("Carrera obligatoria"); }
+      if (!form.grado) { errs.grado = true; msgs.push("Selecciona grado"); }
+      if (!form.matricula.trim()) { errs.matricula = true; msgs.push("Matrícula obligatoria"); }
+    }
+    if (p === 1) {
+      for (let i = 0; i < numRutas; i++) {
+        const t = trayectos[i];
+        if (!t?.origen?.trim() || !t?.destino?.trim()) {
+          errs[`trayecto${i}`] = true;
+          msgs.push(`Completa origen y destino del trayecto ${i + 1}`);
+        }
       }
     }
-
-    if (!vivienda.tipo) { errs.viviendaTipo = true; msgs.push("Tipo de vivienda"); }
-    if (vivienda.techoLamina !== "si" && vivienda.techoLamina !== "no") {
-      errs.techoLamina = true; msgs.push("¿Techo de lámina?");
+    if (p === 2) {
+      familiares.forEach((f, i) => {
+        if (!f.nombre.trim()) return;
+        if (!f.parentesco) { errs[`fam${i}p`] = true; msgs.push(`Familiar ${i + 1}: parentesco`); }
+        if (!f.ocupacion) { errs[`fam${i}o`] = true; msgs.push(`Familiar ${i + 1}: ocupación`); }
+      });
     }
-    if (!vivienda.paredes) { errs.paredes = true; msgs.push("Material de paredes"); }
-    if (!vivienda.piso) { errs.piso = true; msgs.push("Material del piso"); }
-
-    familiares.forEach((f, i) => {
-      if (!f.nombre.trim()) return;
-      if (!f.parentesco) { errs[`fam${i}p`] = true; msgs.push(`Familiar ${i + 1}: parentesco`); }
-      if (!f.ocupacion) { errs[`fam${i}o`] = true; msgs.push(`Familiar ${i + 1}: ocupación`); }
-    });
-
-    for (const d of DOCS) {
-      if (!docs[d.tipo]) {
-        errs[d.tipo] = true;
-        msgs.push(`Falta PDF: ${d.label}`);
+    if (p === 4) {
+      if (!vivienda.tipo) { errs.viviendaTipo = true; msgs.push("Tipo de vivienda"); }
+      if (vivienda.techoLamina !== "si" && vivienda.techoLamina !== "no") {
+        errs.techoLamina = true; msgs.push("¿Techo de lámina?");
       }
+      if (!vivienda.paredes) { errs.paredes = true; msgs.push("Material de paredes"); }
+      if (!vivienda.piso) { errs.piso = true; msgs.push("Material del piso"); }
     }
-
+    if (p === 6) {
+      for (const d of DOCS) {
+        if (!docs[d.tipo]) {
+          errs[d.tipo] = true;
+          msgs.push(`Falta PDF: ${d.label}`);
+        }
+      }
+      if (!aceptaTerminos) { msgs.push("Debes aceptar los Términos y condiciones"); }
+      if (!aceptaPrivacidad) { msgs.push("Debes aceptar el Aviso de privacidad"); }
+    }
     return { errs, msgs };
   }
+
+  function validarCliente() {
+    let allErrs = {};
+    let allMsgs = [];
+    for (let p = 0; p <= 6; p++) {
+      const { errs, msgs } = validarPaso(p);
+      allErrs = { ...allErrs, ...errs };
+      allMsgs = allMsgs.concat(msgs);
+    }
+    return { errs: allErrs, msgs: allMsgs };
+  }
+
+  function avanzarPaso(e) {
+    e.preventDefault();
+    const { errs, msgs } = validarPaso(paso);
+    setFieldErrors(errs);
+    if (msgs.length) {
+      setError(msgs.join(". "));
+      return;
+    }
+    setError("");
+    setPaso((p) => Math.min(p + 1, PASOS.length - 1));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
 
   function setFamiliar(i, key, val) {
     setFamiliares((prev) => prev.map((f, idx) => (idx === i ? { ...f, [key]: val } : f)));
@@ -383,13 +428,27 @@ export default function Solicitud() {
     <div className="page-shell" style={{ background: C.paper }}>
       <GovHeader compact />
 
-      <form onSubmit={enviar} className="page-body" style={{ maxWidth: 900, margin: "0 auto", padding: "clamp(16px, 3vw, 32px) clamp(14px, 3vw, 24px) 40px" }}>
-        <p style={{ fontSize: 15.1, color: "#6b7785", marginBottom: 14, lineHeight: 1.45 }}>
-          Formato de estudio socioeconómico — Programa Apoyo al Transporte Escolar. Completa todos los campos y adjunta los PDF escaneados.
+      <form onSubmit={paso < 6 ? avanzarPaso : enviar} className="page-body" style={{ maxWidth: 900, margin: "0 auto", padding: "clamp(16px, 3vw, 32px) clamp(14px, 3vw, 24px) 40px" }}>
+        <p style={{ fontSize: 15.1, color: "#6b7785", marginBottom: 10, lineHeight: 1.45 }}>
+          Formato de estudio socioeconómico — Programa Apoyo al Transporte Escolar. Completa sección por sección.
         </p>
+        <div style={{ display: "flex", gap: 6, marginBottom: 18, flexWrap: "wrap" }}>
+          {PASOS.map((label, i) => (
+            <div key={label} style={{
+              flex: "1 1 auto",
+              minWidth: 0,
+              height: 4,
+              borderRadius: 999,
+              background: i <= paso ? C.navy : C.paperDim,
+            }} title={label} />
+          ))}
+        </div>
+        <div style={{ fontSize: 13.5, color: "#6b7785", marginBottom: 14, fontWeight: 600 }}>
+          Paso {paso + 1} de {PASOS.length}: {PASOS[paso]}
+        </div>
 
         {/* DATOS DEL SOLICITANTE */}
-        <Section title="Datos del solicitante" icon={User}>
+        {paso === 0 && <Section title="Datos del solicitante" icon={User}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
             <Field label="Nombre(s)"><input required value={form.nombre} onChange={(e) => setF("nombre", e.target.value)} style={inputStyle(fieldErrors.nombre)} /></Field>
             <Field label="Apellidos"><input required value={form.apellidos} onChange={(e) => setF("apellidos", e.target.value)} style={inputStyle(fieldErrors.apellidos)} /></Field>
@@ -422,10 +481,10 @@ export default function Solicitud() {
             )}
             {errorFoto && <div style={{ color: C.garnet, fontSize: 13.9 }}>{errorFoto}</div>}
           </Field>
-        </Section>
+        </Section>}
 
         {/* TRAYECTOS */}
-        <Section title="Trayectos (máx. 2 rutas)" icon={Bus}>
+        {paso === 1 && <Section title="Trayectos (máx. 2 rutas)" icon={Bus}>
           <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
             {[1, 2].map((n) => (
               <button key={n} type="button" onClick={() => { setNumRutas(n); setTrayectos((t) => { const c = [...t]; while (c.length < n) c.push({ origen: "", destino: "" }); return c.slice(0, n); }); }}
@@ -441,10 +500,10 @@ export default function Solicitud() {
               <input placeholder="Destino (ej. UPA Aguascalientes)" value={t.destino} onChange={(e) => setTrayectos((arr) => arr.map((x, j) => j === i ? { ...x, destino: e.target.value } : x))} style={inputStyle()} required />
             </div>
           ))}
-        </Section>
+        </Section>}
 
         {/* DATOS FAMILIARES */}
-        <Section title="Datos familiares" icon={Users}>
+        {paso === 2 && <Section title="Datos familiares" icon={Users}>
           <p style={{ fontSize: 13.9, color: "#6b7785", marginBottom: 10 }}>Incluye a quienes viven en el hogar (códigos del formato oficial).</p>
           {familiares.map((f, i) => (
             <div key={i} style={{ border: `1px solid ${C.paperDim}`, borderRadius: 10, padding: 10, marginBottom: 10 }}>
@@ -469,10 +528,10 @@ export default function Solicitud() {
               + Agregar familiar
             </button>
           )}
-        </Section>
+        </Section>}
 
         {/* INGRESOS Y EGRESOS */}
-        <Section title="Ingresos y egresos familiares" icon={Wallet}>
+        {paso === 3 && <Section title="Ingresos y egresos familiares" icon={Wallet}>
           <div style={{ fontSize: 13.9, fontWeight: 700, color: C.navy, marginBottom: 6 }}>Ingresos ($)</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 }}>
             <input placeholder="Persona 1" value={ingresos.persona1} onChange={(e) => setIngresos((p) => ({ ...p, persona1: e.target.value }))} style={inputStyle()} inputMode="decimal" />
@@ -487,10 +546,10 @@ export default function Solicitud() {
             <input placeholder="Otro" value={egresos.otro} onChange={(e) => setEgresos((p) => ({ ...p, otro: e.target.value }))} style={inputStyle()} inputMode="decimal" />
           </div>
           <div className="f-mono" style={{ fontSize: 15.1, marginTop: 8, color: C.navy }}>Total egresos: ${totalEgr}</div>
-        </Section>
+        </Section>}
 
         {/* VIVIENDA */}
-        <Section title="Datos de la vivienda" icon={Home}>
+        {paso === 4 && <Section title="Datos de la vivienda" icon={Home}>
           <Field label="1. Su vivienda es">
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {["propia", "prestada", "rentada"].map((v) => (
@@ -546,19 +605,20 @@ export default function Solicitud() {
               ))}
             </div>
           </Field>
-        </Section>
+        </Section>}
 
         {/* DISCAPACIDAD */}
-        <Section title="¿Tiene alguna discapacidad o enfermedad?" icon={ShieldAlert}>
+        {paso === 5 && <Section title="¿Tiene alguna discapacidad o enfermedad?" icon={ShieldAlert}>
           {discapacidad.map((d, i) => (
             <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 6, marginBottom: 8 }}>
               <input placeholder={`Persona ${i + 1}`} value={d.persona} onChange={(e) => setDiscapacidad((arr) => arr.map((x, j) => j === i ? { ...x, persona: e.target.value } : x))} style={inputStyle()} />
               <input placeholder="Detalle / ¿cuál?" value={d.detalle} onChange={(e) => setDiscapacidad((arr) => arr.map((x, j) => j === i ? { ...x, detalle: e.target.value } : x))} style={inputStyle()} />
             </div>
           ))}
-        </Section>
+        </Section>}
 
         {/* DOCUMENTOS PDF */}
+        {paso === 6 && (
         <Section title="Documentos (PDF escaneados)" icon={FileText}>
           <p style={{ fontSize: 13.9, color: "#6b7785", marginBottom: 10 }}>Obligatorios. Solo PDF, máximo 1.5 MB cada uno.</p>
           {DOCS.map((d) => (
@@ -574,19 +634,36 @@ export default function Solicitud() {
               )}
             </div>
           ))}
+            <label style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 10, cursor: "pointer", fontSize: 14.5 }}>
+              <input type="checkbox" checked={aceptaTerminos} onChange={(e) => setAceptaTerminos(e.target.checked)} style={{ marginTop: 3 }} />
+              <span>Acepto los <a href="/terminos" target="_blank" rel="noopener" style={{ color: C.busBlue, fontWeight: 600 }}>Términos y condiciones</a>.</span>
+            </label>
+            <label style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 14, cursor: "pointer", fontSize: 14.5 }}>
+              <input type="checkbox" checked={aceptaPrivacidad} onChange={(e) => setAceptaPrivacidad(e.target.checked)} style={{ marginTop: 3 }} />
+              <span>Acepto el <a href="/privacidad" target="_blank" rel="noopener" style={{ color: C.busBlue, fontWeight: 600 }}>Aviso de privacidad</a>.</span>
+            </label>
         </Section>
+        )}
 
         {error && (
-          <div style={{ display: "flex", gap: 8, alignItems: "flex-start", background: `${C.garnet}12`, border: `1px solid ${C.garnet}`, color: C.garnet, borderRadius: 10, padding: 12, fontSize: 15.8, marginBottom: 12 }}>
+          <div style={{ display: "flex", gap: 8, alignItems: "flex-start", background: `${C.garnet}12`, border: `1px solid ${C.garnet}`, color: C.garnet, borderRadius: 8, padding: 12, fontSize: 15.8, marginBottom: 12 }}>
             <ShieldAlert size={16} style={{ flexShrink: 0 }} /> {error}
           </div>
         )}
 
-        <button type="submit" disabled={enviando} style={{ width: "100%", padding: "14px 0", borderRadius: 12, border: "none", background: C.navy, color: "#fff", fontSize: 17.6, fontWeight: 700, cursor: enviando ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-          {enviando ? <><Loader2 size={16} className="spin" /> Enviando…</> : "Enviar solicitud"}
-        </button>
+        <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+          {paso > 0 && (
+            <button type="button" onClick={() => { setError(""); setPaso((p) => p - 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+              style={{ flex: 1, padding: "14px 0", borderRadius: 8, border: `1px solid ${C.navy}`, background: "#fff", color: C.navy, fontSize: 16, fontWeight: 700, cursor: "pointer" }}>
+              Atrás
+            </button>
+          )}
+          <button type="submit" disabled={enviando} style={{ flex: 2, padding: "14px 0", borderRadius: 8, border: "none", background: C.navy, color: "#fff", fontSize: 17.6, fontWeight: 700, cursor: enviando ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+            {enviando ? <><Loader2 size={16} className="spin" /> Enviando…</> : (paso < 6 ? "Continuar" : "Enviar solicitud")}
+          </button>
+        </div>
         <p style={{ fontSize: 13.3, color: "#8993A1", textAlign: "center", marginTop: 12, lineHeight: 1.4 }}>
-          Al enviar declaras que la información es verídica. Recaudación revisará los datos y documentos.
+          {paso < 6 ? "Se valida cada sección al continuar." : "Al enviar declaras que la información es verídica. Recaudación revisará los datos y documentos."}
         </p>
       </form>
       <GovFooter />

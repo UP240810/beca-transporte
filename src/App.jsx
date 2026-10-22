@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SesionProvider } from "./context/SesionContext";
 import { StaffSesionProvider } from "./context/StaffSesionContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ConsentModal from "./components/ConsentModal";
+import PageLoader from "./components/PageLoader";
 
 import Landing from "./pages/Landing";
 import Acceso from "./pages/Acceso";
@@ -16,6 +18,7 @@ import AlumnoDashboard from "./pages/AlumnoDashboard";
 import Recarga from "./pages/Recarga";
 import Camionero from "./pages/Camionero";
 import NotFound from "./pages/NotFound";
+import BadRequest from "./pages/BadRequest";
 import FAQ from "./pages/FAQ";
 import Contabilidad from "./pages/Contabilidad";
 import Recaudacion from "./pages/Recaudacion";
@@ -23,12 +26,17 @@ import Transportistas from "./pages/Transportistas";
 import AdminPersonal from "./pages/AdminPersonal";
 import RecuperarPassword from "./pages/RecuperarPassword";
 import RestablecerPassword from "./pages/RestablecerPassword";
+import Terminos from "./pages/Terminos";
+import Privacidad from "./pages/Privacidad";
+import Cookies from "./pages/Cookies";
 
 export default function App() {
   return (
     <SesionProvider>
       <StaffSesionProvider>
         <BrowserRouter>
+          <PageLoader />
+          <ConsentModal />
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/acceso" element={<Acceso />} />
@@ -38,6 +46,10 @@ export default function App() {
             <Route path="/ayuda" element={<FAQ />} />
             <Route path="/personal" element={<ProtectedRoute roles={["recaudacion","ventanilla","camionero","desarrollo_social","admin_transportistas"]}><AdminPersonal /></ProtectedRoute>} />
             <Route path="/faq" element={<FAQ />} />
+            <Route path="/terminos" element={<Terminos />} />
+            <Route path="/privacidad" element={<Privacidad />} />
+            <Route path="/cookies" element={<Cookies />} />
+            <Route path="/400" element={<BadRequest />} />
 
             {/* Alumno */}
             <Route path="/alumno/login" element={<AlumnoLogin />} />

@@ -204,3 +204,35 @@ a {
   .reveal { opacity: 1; transform: none; transition: none; }
   .lift:hover { transform: none; }
 }
+
+
+/* ---- Column-inspired refinements (paleta Calvillo conservada) ---- */
+.lift {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.lift:hover {
+  box-shadow: 0 8px 24px rgba(0, 51, 102, 0.1) !important;
+  transform: translateY(-1px);
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.reveal.in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Cards institucionales: radio 8px, sombra sutil */
+.card-col {
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e3e4e8;
+  box-shadow: rgba(18, 22, 30, 0.024) 0px 1px 4px 0px, rgba(18, 22, 30, 0.05) 0px 1px 0px 0px;
+}
+
+button, .btn-primary {
+  border-radius: 8px;
+}
