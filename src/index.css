@@ -104,7 +104,7 @@ img { max-width: 100%; }
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px max(clamp(14px, 3vw, 32px), calc((100% - 1200px) / 2 + 28px));
+  padding: 10px max(clamp(14px, 3vw, 32px), calc((100% - 1200px) / 2));
 }
 .hdr-bar.compact { padding-top: 8px; padding-bottom: 8px; }
 .hdr-link-solicitud {
@@ -125,6 +125,7 @@ img { max-width: 100%; }
 }
 
 .foot-bottom {
+  padding-inline: max(clamp(16px, 4vw, 28px), calc((100% - 1200px) / 2)) !important;
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
@@ -156,3 +157,13 @@ input, select, textarea {
 a {
   color: #4078D1;
 }
+
+/* Páginas con header + footer: el footer siempre queda al fondo */
+.page-shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.page-shell > main,
+.page-shell > .page-body { width: 100%; }

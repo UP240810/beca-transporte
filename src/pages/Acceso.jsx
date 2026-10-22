@@ -17,14 +17,14 @@ const accesos = [
 
 export default function Acceso() {
   return (
-    <div style={{ minHeight: "100vh", background: C.paper, fontFamily: "system-ui, sans-serif", color: C.ink }}>
+    <div className="page-shell" style={{ background: C.paper, fontFamily: "system-ui, sans-serif", color: C.ink }}>
       <GovHeader compact />
-      <main style={{ maxWidth: 720, margin: "0 auto", padding: "36px 24px 48px" }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800, color: C.navy, margin: "0 0 6px" }}>Accesos al sistema</h1>
-        <p style={{ fontSize: 14, color: "#6b7785", marginBottom: 24 }}>
+      <main style={{ maxWidth: 960, margin: "0 auto", padding: "clamp(24px, 5vw, 44px) clamp(16px, 4vw, 24px) 48px" }}>
+        <h1 style={{ fontSize: "clamp(26px, 4vw, 32px)", fontWeight: 800, color: C.navy, margin: "0 0 8px" }}>Accesos al sistema</h1>
+        <p style={{ fontSize: 16.5, color: "#6b7785", marginBottom: 24 }}>
           Elige el área que te corresponde. También puedes abrir este menú desde las tres rayas del encabezado.
         </p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(300px, 100%), 1fr))", gap: 12 }}>
           {accesos.map((o) => (
             <Link
               key={o.to}
@@ -43,8 +43,8 @@ export default function Acceso() {
                 <o.icon size={20} color={o.color === C.gold ? C.navy : o.color} />
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14.5, fontWeight: 750, color: C.navy }}>{o.t}</div>
-                <div style={{ fontSize: 12, color: "#6b7785", marginTop: 2 }}>{o.d}</div>
+                <div style={{ fontSize: 17.5, fontWeight: 750, color: C.navy }}>{o.t}</div>
+                <div style={{ fontSize: 14.5, color: "#6b7785", marginTop: 2 }}>{o.d}</div>
               </div>
               <ChevronRight size={18} color="#8993A1" />
             </Link>

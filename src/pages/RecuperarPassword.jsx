@@ -28,9 +28,9 @@ export default function RecuperarPassword() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: C.paper || "#F7F8FA", fontFamily: "system-ui, sans-serif" }}>
+    <div className="page-shell" style={{ background: C.paper || "#F7F8FA", fontFamily: "system-ui, sans-serif" }}>
       <GovHeader compact />
-      <div style={{ maxWidth: 430, margin: "0 auto", padding: "32px 18px" }}>
+      <div className="page-body" style={{ maxWidth: 480, margin: "0 auto", padding: "32px 18px" }}>
         <header style={{ background: "#fff", borderBottom: `3px solid ${C.navy}`, padding: "12px 16px", display: "flex", alignItems: "center", gap: 12, borderRadius: 10 }}>
           <Link to="/acceso" style={{ display: "flex", color: C.navy }}><ArrowLeft size={18} /></Link>
           <BrandLogos variant="municipio" height={28} />

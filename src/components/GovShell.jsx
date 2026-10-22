@@ -155,7 +155,7 @@ export function GovFooter({ flush = false }) {
   const titulo = { fontSize: 14, fontWeight: 700, letterSpacing: 0.8, marginBottom: 12, color: C.gold };
   const texto = { fontSize: 15.5, lineHeight: 1.65, margin: 0, opacity: 0.94 };
   return (
-    <footer style={{ marginTop: flush ? 0 : 48 }}>
+    <footer style={{ marginTop: flush ? 0 : "auto" }}>
       <div style={{ background: C.navy, color: "#fff", padding: "clamp(28px, 5vw, 44px) clamp(16px, 4vw, 28px) 28px" }}>
         <div style={{
           maxWidth: 1200,
@@ -410,9 +410,9 @@ export function Btn({ children, onClick, variant = "primary", type = "button", d
       style={{
         border: "none",
         borderRadius: 9,
-        padding: "10px 16px",
+        padding: "13px 20px",
         fontWeight: 700,
-        fontSize: 13,
+        fontSize: 16,
         cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.6 : 1,
         ...styles[variant],
@@ -426,7 +426,7 @@ export function Btn({ children, onClick, variant = "primary", type = "button", d
 
 export function Field({ label, children }) {
   return (
-    <label style={{ display: "block", fontSize: 12.5, color: "#5b6675", marginBottom: 10 }}>
+    <label style={{ display: "block", fontSize: 15, color: "#5b6675", marginBottom: 12 }}>
       <span style={{ display: "block", marginBottom: 4, fontWeight: 600 }}>{label}</span>
       {children}
     </label>
@@ -435,10 +435,10 @@ export function Field({ label, children }) {
 
 export const inputStyle = {
   width: "100%",
-  padding: "10px 12px",
-  borderRadius: 9,
+  padding: "12px 14px",
+  borderRadius: 10,
   border: `1px solid ${C.paperDim}`,
-  fontSize: 14,
+  fontSize: 16,
   boxSizing: "border-box",
   background: "#fff",
   color: C.ink,

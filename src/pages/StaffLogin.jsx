@@ -46,12 +46,12 @@ export default function StaffLogin({ rol = "recaudacion" }) {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: C.paper, fontFamily: "system-ui, sans-serif" }}>
+    <div className="page-shell" style={{ background: C.paper, fontFamily: "system-ui, sans-serif" }}>
       <GovHeader compact />
-      <main style={{ maxWidth: 420, margin: "0 auto", padding: "40px 20px" }}>
-        <Card style={{ padding: 24 }}>
-          <h1 style={{ margin: "0 0 4px", fontSize: 20, color: C.navy, fontWeight: 800 }}>{meta.title}</h1>
-          <p style={{ margin: "0 0 20px", fontSize: 13, color: "#6b7785" }}>Inicia sesión con tu usuario municipal.</p>
+      <main style={{ maxWidth: 480, margin: "0 auto", padding: "clamp(24px, 6vw, 56px) 20px" }}>
+        <Card style={{ padding: "clamp(20px, 4vw, 32px)" }}>
+          <h1 style={{ margin: "0 0 4px", fontSize: 28, color: C.navy, fontWeight: 800 }}>{meta.title}</h1>
+          <p style={{ margin: "0 0 22px", fontSize: 16, color: "#6b7785" }}>Inicia sesión con tu usuario municipal.</p>
           <form onSubmit={onSubmit}>
             <Field label="Usuario">
               <input style={inputStyle} value={usuario} onChange={(e) => setUsuario(e.target.value)} autoComplete="username" required />
@@ -59,10 +59,10 @@ export default function StaffLogin({ rol = "recaudacion" }) {
             <Field label="Contraseña">
               <input style={inputStyle} type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
             </Field>
-            {err && <p style={{ color: C.garnet, fontSize: 13, marginBottom: 12 }}>{err}</p>}
+            {err && <p style={{ color: C.garnet, fontSize: 15, marginBottom: 12 }}>{err}</p>}
             <Btn type="submit" disabled={busy} style={{ width: "100%" }}>{busy ? "Entrando…" : "Entrar"}</Btn>
           </form>
-          <p style={{ marginTop: 16, fontSize: 12, textAlign: "center" }}>
+          <p style={{ marginTop: 18, fontSize: 15, textAlign: "center" }}>
             <Link to="/acceso" style={{ color: C.busBlue }}>← Otros accesos</Link>
             {" · "}
             <Link to="/recuperar" style={{ color: C.busBlue }}>Recuperar contraseña</Link>

@@ -71,7 +71,7 @@ const MAX_PDF = 1.5 * 1024 * 1024; // 1.5 MB
 const errBorder = (bad) => bad ? C.garnet : C.paperDim;
 const baseInput = {
   width: "100%", borderRadius: 9,
-  padding: "10px 12px", fontSize: 13, color: C.ink, outline: "none",
+  padding: "10px 12px", fontSize: 16.4, color: C.ink, outline: "none",
   boxSizing: "border-box", background: "#fff",
 };
 function inputStyle(bad) {
@@ -82,11 +82,11 @@ function inputStyle(bad) {
 function Field({ label, icon: Icon, children, hint }) {
   return (
     <div style={{ marginBottom: 14 }}>
-      <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11.5, fontWeight: 600, color: C.navy, marginBottom: 6 }}>
+      <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 14.5, fontWeight: 600, color: C.navy, marginBottom: 6 }}>
         {Icon && <Icon size={13} />} {label}
       </label>
       {children}
-      {hint && <div style={{ fontSize: 10.5, color: "#8993A1", marginTop: 4 }}>{hint}</div>}
+      {hint && <div style={{ fontSize: 13.3, color: "#8993A1", marginTop: 4 }}>{hint}</div>}
     </div>
   );
 }
@@ -109,7 +109,7 @@ function Section({ title, icon: Icon, children }) {
     <div style={{ background: "#fff", border: `1px solid ${C.paperDim}`, borderRadius: 14, padding: 16, marginBottom: 14 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
         {Icon && <Icon size={15} color={C.navy} />}
-        <div className="f-display" style={{ fontSize: 14, fontWeight: 700, color: C.navy }}>{title}</div>
+        <div className="f-display" style={{ fontSize: 17.6, fontWeight: 700, color: C.navy }}>{title}</div>
       </div>
       {children}
     </div>
@@ -350,19 +350,24 @@ export default function Solicitud() {
 
   if (enviado) {
     return (
-      <div style={{ maxWidth: 480, margin: "0 auto", minHeight: "100vh", background: C.paper, padding: 20 }}>
+      <div className="page-shell" style={{ background: C.paper }}>
+        <GovHeader compact />
+        <div className="page-body" style={{ maxWidth: 520, margin: "clamp(20px, 5vw, 48px) auto", padding: "0 20px" }}>
         <div style={{ background: "#fff", borderRadius: 16, padding: 28, textAlign: "center", border: `1px solid ${C.mint}` }}>
           <CheckCircle2 size={40} color="#1F7A56" style={{ marginBottom: 12 }} />
           <div className="f-display" style={{ fontSize: 18, fontWeight: 700, color: C.navy }}>Solicitud enviada</div>
-          <p style={{ fontSize: 13, color: "#5B6675", marginTop: 8 }}>Tu folio es:</p>
+          <p style={{ fontSize: 16.4, color: "#5B6675", marginTop: 8 }}>Tu folio es:</p>
           <div className="f-mono" style={{ fontSize: 20, fontWeight: 700, color: C.navy, margin: "10px 0" }}>{folio}</div>
-          <p style={{ fontSize: 12, color: "#6b7785", lineHeight: 1.5 }}>
+          <p style={{ fontSize: 15.1, color: "#6b7785", lineHeight: 1.5 }}>
             Guárdalo. Te avisaremos por correo cuando sea revisada.
           </p>
           <button type="button" onClick={() => navigate("/")} style={{ marginTop: 18, width: "100%", padding: "12px 0", borderRadius: 10, border: "none", background: C.navy, color: "#fff", fontWeight: 700, cursor: "pointer" }}>
             Volver al inicio
           </button>
         </div>
+        </div>
+        <GovFooter />
+        <A11yWidget />
       </div>
     );
   }
@@ -375,11 +380,11 @@ export default function Solicitud() {
     (Number(egresos.otro) || 0);
 
   return (
-    <div style={{ maxWidth: 520, margin: "0 auto", minHeight: "100vh", background: C.paper }}>
+    <div className="page-shell" style={{ background: C.paper }}>
       <GovHeader compact />
 
-      <form onSubmit={enviar} style={{ padding: 16 }}>
-        <p style={{ fontSize: 12, color: "#6b7785", marginBottom: 14, lineHeight: 1.45 }}>
+      <form onSubmit={enviar} className="page-body" style={{ maxWidth: 900, margin: "0 auto", padding: "clamp(16px, 3vw, 32px) clamp(14px, 3vw, 24px) 40px" }}>
+        <p style={{ fontSize: 15.1, color: "#6b7785", marginBottom: 14, lineHeight: 1.45 }}>
           Formato de estudio socioeconómico — Programa Apoyo al Transporte Escolar. Completa todos los campos y adjunta los PDF escaneados.
         </p>
 
@@ -410,12 +415,12 @@ export default function Solicitud() {
             {foto ? (
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <img src={foto} alt="" style={{ width: 56, height: 56, borderRadius: 8, objectFit: "cover" }} />
-                <button type="button" onClick={() => setFoto(null)} style={{ border: "none", background: "none", color: C.garnet, fontSize: 12, cursor: "pointer" }}><XIcon size={14} /> Quitar</button>
+                <button type="button" onClick={() => setFoto(null)} style={{ border: "none", background: "none", color: C.garnet, fontSize: 15.1, cursor: "pointer" }}><XIcon size={14} /> Quitar</button>
               </div>
             ) : (
               <input type="file" accept="image/*" onChange={handleFoto} disabled={comprimiendoFoto} />
             )}
-            {errorFoto && <div style={{ color: C.garnet, fontSize: 11 }}>{errorFoto}</div>}
+            {errorFoto && <div style={{ color: C.garnet, fontSize: 13.9 }}>{errorFoto}</div>}
           </Field>
         </Section>
 
@@ -424,14 +429,14 @@ export default function Solicitud() {
           <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
             {[1, 2].map((n) => (
               <button key={n} type="button" onClick={() => { setNumRutas(n); setTrayectos((t) => { const c = [...t]; while (c.length < n) c.push({ origen: "", destino: "" }); return c.slice(0, n); }); }}
-                style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "none", fontWeight: 700, fontSize: 12, cursor: "pointer", background: numRutas === n ? C.navy : C.paper, color: numRutas === n ? "#fff" : C.navy }}>
+                style={{ flex: 1, padding: "8px 0", borderRadius: 8, border: "none", fontWeight: 700, fontSize: 15.1, cursor: "pointer", background: numRutas === n ? C.navy : C.paper, color: numRutas === n ? "#fff" : C.navy }}>
                 {n} ruta{n > 1 ? "s" : ""}
               </button>
             ))}
           </div>
           {trayectos.slice(0, numRutas).map((t, i) => (
             <div key={i} style={{ marginBottom: 10, padding: 10, background: C.paper, borderRadius: 10 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: C.navy, marginBottom: 6 }}>Trayecto {i + 1}</div>
+              <div style={{ fontSize: 13.9, fontWeight: 700, color: C.navy, marginBottom: 6 }}>Trayecto {i + 1}</div>
               <input placeholder="Origen (ej. Calvillo Centro)" value={t.origen} onChange={(e) => setTrayectos((arr) => arr.map((x, j) => j === i ? { ...x, origen: e.target.value } : x))} style={{ ...inputStyle(), marginBottom: 6 }} required />
               <input placeholder="Destino (ej. UPA Aguascalientes)" value={t.destino} onChange={(e) => setTrayectos((arr) => arr.map((x, j) => j === i ? { ...x, destino: e.target.value } : x))} style={inputStyle()} required />
             </div>
@@ -440,10 +445,10 @@ export default function Solicitud() {
 
         {/* DATOS FAMILIARES */}
         <Section title="Datos familiares" icon={Users}>
-          <p style={{ fontSize: 11, color: "#6b7785", marginBottom: 10 }}>Incluye a quienes viven en el hogar (códigos del formato oficial).</p>
+          <p style={{ fontSize: 13.9, color: "#6b7785", marginBottom: 10 }}>Incluye a quienes viven en el hogar (códigos del formato oficial).</p>
           {familiares.map((f, i) => (
             <div key={i} style={{ border: `1px solid ${C.paperDim}`, borderRadius: 10, padding: 10, marginBottom: 10 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: C.navy, marginBottom: 8 }}>Persona {i + 2 <= 10 ? String(i + 2).padStart(2, "0") : i + 1}</div>
+              <div style={{ fontSize: 13.9, fontWeight: 700, color: C.navy, marginBottom: 8 }}>Persona {i + 2 <= 10 ? String(i + 2).padStart(2, "0") : i + 1}</div>
               <input placeholder="Nombre" value={f.nombre} onChange={(e) => setFamiliar(i, "nombre", e.target.value)} style={{ ...inputStyle(), marginBottom: 6 }} />
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 6 }}>
                 <Select value={f.parentesco} onChange={(e) => setFamiliar(i, "parentesco", e.target.value)} options={PARENTESCO} placeholder="Parentesco" />
@@ -460,7 +465,7 @@ export default function Solicitud() {
             </div>
           ))}
           {familiares.length < 9 && (
-            <button type="button" onClick={() => setFamiliares((p) => [...p, familiarVacio()])} style={{ width: "100%", padding: 8, borderRadius: 8, border: `1px dashed ${C.navy}`, background: "none", color: C.navy, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+            <button type="button" onClick={() => setFamiliares((p) => [...p, familiarVacio()])} style={{ width: "100%", padding: 8, borderRadius: 8, border: `1px dashed ${C.navy}`, background: "none", color: C.navy, fontSize: 15.1, fontWeight: 600, cursor: "pointer" }}>
               + Agregar familiar
             </button>
           )}
@@ -468,20 +473,20 @@ export default function Solicitud() {
 
         {/* INGRESOS Y EGRESOS */}
         <Section title="Ingresos y egresos familiares" icon={Wallet}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: C.navy, marginBottom: 6 }}>Ingresos ($)</div>
+          <div style={{ fontSize: 13.9, fontWeight: 700, color: C.navy, marginBottom: 6 }}>Ingresos ($)</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 }}>
             <input placeholder="Persona 1" value={ingresos.persona1} onChange={(e) => setIngresos((p) => ({ ...p, persona1: e.target.value }))} style={inputStyle()} inputMode="decimal" />
             <input placeholder="Persona 2" value={ingresos.persona2} onChange={(e) => setIngresos((p) => ({ ...p, persona2: e.target.value }))} style={inputStyle()} inputMode="decimal" />
           </div>
-          <div className="f-mono" style={{ fontSize: 12, marginBottom: 12, color: C.navy }}>Total ingresos: ${totalIng}</div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: C.navy, marginBottom: 6 }}>Egresos ($)</div>
+          <div className="f-mono" style={{ fontSize: 15.1, marginBottom: 12, color: C.navy }}>Total ingresos: ${totalIng}</div>
+          <div style={{ fontSize: 13.9, fontWeight: 700, color: C.navy, marginBottom: 6 }}>Egresos ($)</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
             <input placeholder="Alimentos" value={egresos.alimentos} onChange={(e) => setEgresos((p) => ({ ...p, alimentos: e.target.value }))} style={inputStyle()} inputMode="decimal" />
             <input placeholder="Vestido / calzado" value={egresos.vestido} onChange={(e) => setEgresos((p) => ({ ...p, vestido: e.target.value }))} style={inputStyle()} inputMode="decimal" />
             <input placeholder="Gastos escolares" value={egresos.escolares} onChange={(e) => setEgresos((p) => ({ ...p, escolares: e.target.value }))} style={inputStyle()} inputMode="decimal" />
             <input placeholder="Otro" value={egresos.otro} onChange={(e) => setEgresos((p) => ({ ...p, otro: e.target.value }))} style={inputStyle()} inputMode="decimal" />
           </div>
-          <div className="f-mono" style={{ fontSize: 12, marginTop: 8, color: C.navy }}>Total egresos: ${totalEgr}</div>
+          <div className="f-mono" style={{ fontSize: 15.1, marginTop: 8, color: C.navy }}>Total egresos: ${totalEgr}</div>
         </Section>
 
         {/* VIVIENDA */}
@@ -489,7 +494,7 @@ export default function Solicitud() {
           <Field label="1. Su vivienda es">
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {["propia", "prestada", "rentada"].map((v) => (
-                <label key={v} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, textTransform: "capitalize" }}>
+                <label key={v} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 15.1, textTransform: "capitalize" }}>
                   <input type="radio" name="viv" checked={vivienda.tipo === v} onChange={() => setVivienda((p) => ({ ...p, tipo: v }))} required /> {v}
                 </label>
               ))}
@@ -498,7 +503,7 @@ export default function Solicitud() {
           <Field label="2. ¿Techo de lámina?">
             <div style={{ display: "flex", gap: 12 }}>
               {["si", "no"].map((v) => (
-                <label key={v} style={{ fontSize: 12, textTransform: "uppercase" }}>
+                <label key={v} style={{ fontSize: 15.1, textTransform: "uppercase" }}>
                   <input type="radio" name="lamina" checked={vivienda.techoLamina === v} onChange={() => setVivienda((p) => ({ ...p, techoLamina: v }))} /> {v}
                 </label>
               ))}
@@ -513,7 +518,7 @@ export default function Solicitud() {
             </Field>
           </div>
           <Field label="3. Cuenta con servicios de">
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 15.1 }}>
               {[
                 ["agua", "Agua potable"],
                 ["luz", "Luz eléctrica"],
@@ -527,7 +532,7 @@ export default function Solicitud() {
             </div>
           </Field>
           <Field label="4. Su casa cuenta con">
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 15.1 }}>
               {[
                 ["refrigerador", "Refrigerador"],
                 ["television", "Televisión"],
@@ -555,14 +560,14 @@ export default function Solicitud() {
 
         {/* DOCUMENTOS PDF */}
         <Section title="Documentos (PDF escaneados)" icon={FileText}>
-          <p style={{ fontSize: 11, color: "#6b7785", marginBottom: 10 }}>Obligatorios. Solo PDF, máximo 1.5 MB cada uno.</p>
+          <p style={{ fontSize: 13.9, color: "#6b7785", marginBottom: 10 }}>Obligatorios. Solo PDF, máximo 1.5 MB cada uno.</p>
           {DOCS.map((d) => (
             <div key={d.tipo} style={{ marginBottom: 12, padding: 10, background: docs[d.tipo] ? `${C.mint}18` : C.paper, borderRadius: 10, border: `1px solid ${docs[d.tipo] ? C.mint : (fieldErrors[d.tipo] ? C.garnet : C.paperDim)}` }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: C.navy, marginBottom: 6 }}>{d.label}</div>
+              <div style={{ fontSize: 15.1, fontWeight: 600, color: C.navy, marginBottom: 6 }}>{d.label}</div>
               {docs[d.tipo] ? (
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 11 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13.9 }}>
                   <span style={{ color: "#1F7A56" }}>✓ {docs[d.tipo].nombreArchivo}</span>
-                  <button type="button" onClick={() => setDocs((p) => { const n = { ...p }; delete n[d.tipo]; return n; })} style={{ border: "none", background: "none", color: C.garnet, cursor: "pointer", fontSize: 11 }}>Quitar</button>
+                  <button type="button" onClick={() => setDocs((p) => { const n = { ...p }; delete n[d.tipo]; return n; })} style={{ border: "none", background: "none", color: C.garnet, cursor: "pointer", fontSize: 13.9 }}>Quitar</button>
                 </div>
               ) : (
                 <input type="file" accept="application/pdf" onChange={(e) => handlePdf(d.tipo, e)} />
@@ -572,18 +577,20 @@ export default function Solicitud() {
         </Section>
 
         {error && (
-          <div style={{ display: "flex", gap: 8, alignItems: "flex-start", background: `${C.garnet}12`, border: `1px solid ${C.garnet}`, color: C.garnet, borderRadius: 10, padding: 12, fontSize: 12.5, marginBottom: 12 }}>
+          <div style={{ display: "flex", gap: 8, alignItems: "flex-start", background: `${C.garnet}12`, border: `1px solid ${C.garnet}`, color: C.garnet, borderRadius: 10, padding: 12, fontSize: 15.8, marginBottom: 12 }}>
             <ShieldAlert size={16} style={{ flexShrink: 0 }} /> {error}
           </div>
         )}
 
-        <button type="submit" disabled={enviando} style={{ width: "100%", padding: "14px 0", borderRadius: 12, border: "none", background: C.navy, color: "#fff", fontSize: 14, fontWeight: 700, cursor: enviando ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+        <button type="submit" disabled={enviando} style={{ width: "100%", padding: "14px 0", borderRadius: 12, border: "none", background: C.navy, color: "#fff", fontSize: 17.6, fontWeight: 700, cursor: enviando ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
           {enviando ? <><Loader2 size={16} className="spin" /> Enviando…</> : "Enviar solicitud"}
         </button>
-        <p style={{ fontSize: 10.5, color: "#8993A1", textAlign: "center", marginTop: 12, lineHeight: 1.4 }}>
+        <p style={{ fontSize: 13.3, color: "#8993A1", textAlign: "center", marginTop: 12, lineHeight: 1.4 }}>
           Al enviar declaras que la información es verídica. Recaudación revisará los datos y documentos.
         </p>
       </form>
+      <GovFooter />
+      <A11yWidget />
     </div>
   );
 }
