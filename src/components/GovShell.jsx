@@ -16,27 +16,6 @@ const ACCESOS = [
   { to: "/transportistas/login", icon: ShieldCheck, t: "Admin transportistas", d: "Viajes por unidad" },
 ];
 
-/** Patrón decorativo tipo greca / guayaba abstracta */
-function PatternBar({ height = 28 }) {
-  return (
-    <div
-      aria-hidden
-      style={{
-        height,
-        background: `repeating-linear-gradient(
-          90deg,
-          ${C.navy} 0 10px,
-          ${C.navySoft} 10px 14px,
-          ${C.gold} 14px 18px,
-          ${C.navySoft} 18px 22px,
-          ${C.navy} 22px 32px
-        )`,
-        opacity: 0.92,
-      }}
-    />
-  );
-}
-
 export function GovHeader({ compact = false }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const loc = useLocation();
@@ -49,41 +28,33 @@ export function GovHeader({ compact = false }) {
     <>
       <header style={{ position: "sticky", top: 0, zIndex: 50, background: "#fff", boxShadow: "0 2px 12px rgba(0,51,102,0.12)" }}>
         {/* Barra superior institucional */}
-        <div style={{
-          background: C.navy,
-          color: "#fff",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: compact ? "8px 18px" : "10px 28px",
-          gap: 12,
-          flexWrap: "wrap",
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            <Link to="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", color: "#fff" }}>
-              <BrandLogos variant="municipio" height={compact ? 34 : 42} />
-              <div style={{ lineHeight: 1.15 }}>
-                <div style={{ fontSize: compact ? 13 : 15, fontWeight: 700, letterSpacing: 0.3 }}>CALVILLO</div>
-                <div style={{ fontSize: 10, opacity: 0.85, fontWeight: 500 }}>Gobierno Municipal · 2024-2027</div>
-              </div>
-            </Link>
-          </div>
+        <div
+          className={compact ? "hdr-bar compact" : "hdr-bar"}
+          style={{ background: C.navy, color: "#fff" }}
+        >
+          <Link to="/" style={{ display: "flex", alignItems: "center", gap: 14, textDecoration: "none", color: "#fff", minWidth: 0 }}>
+            <BrandLogos
+              variant="municipio"
+              onDark
+              height={compact ? "clamp(52px, 8vw, 64px)" : "clamp(60px, 9vw, 80px)"}
+            />
+            <div className="hdr-brand-text" style={{ lineHeight: 1.2 }}>
+              <div style={{ fontSize: compact ? 16 : 19, fontWeight: 700, letterSpacing: 0.3 }}>CALVILLO</div>
+              <div style={{ fontSize: 13, opacity: 0.88, fontWeight: 500 }}>Gobierno Municipal · 2024-2027</div>
+            </div>
+          </Link>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
             <Link
               to="/solicitud"
+              className="hdr-link-solicitud"
               style={{
-                display: "none",
-                sm: "inline",
-                fontSize: 12,
                 color: "#fff",
                 textDecoration: "none",
-                padding: "6px 12px",
-                borderRadius: 20,
-                border: "1px solid rgba(255,255,255,0.35)",
+                borderRadius: 24,
+                border: "1px solid rgba(255,255,255,0.45)",
                 fontWeight: 600,
               }}
-              className="hdr-link-solicitud"
             >
               Solicitar beca
             </Link>
@@ -93,9 +64,9 @@ export function GovHeader({ compact = false }) {
               aria-expanded={menuOpen}
               onClick={() => setMenuOpen((v) => !v)}
               style={{
-                width: 44,
-                height: 44,
-                borderRadius: 10,
+                width: 48,
+                height: 48,
+                borderRadius: 12,
                 border: "none",
                 background: menuOpen ? C.gold : "rgba(255,255,255,0.12)",
                 color: menuOpen ? C.navy : "#fff",
@@ -105,21 +76,20 @@ export function GovHeader({ compact = false }) {
                 justifyContent: "center",
               }}
             >
-              {menuOpen ? <X size={22} /> : <Menu size={22} />}
+              {menuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
-        <PatternBar height={6} />
 
         {/* Panel menú hamburguesa — logins por área */}
         {menuOpen && (
           <div
             style={{
               position: "absolute",
-              right: 16,
+              right: 12,
               top: "100%",
               marginTop: 8,
-              width: "min(340px, calc(100vw - 32px))",
+              width: "min(380px, calc(100vw - 24px))",
               background: "#fff",
               borderRadius: 14,
               boxShadow: "0 16px 40px rgba(0,51,102,0.2)",
@@ -129,8 +99,8 @@ export function GovHeader({ compact = false }) {
             }}
           >
             <div style={{ padding: "12px 16px", background: C.paper, borderBottom: `1px solid ${C.paperDim}` }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: C.navy, letterSpacing: 0.6 }}>ACCESOS AL SISTEMA</div>
-              <div style={{ fontSize: 12, color: "#6b7785", marginTop: 2 }}>Elige tu área para iniciar sesión</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: C.navy, letterSpacing: 0.6 }}>ACCESOS AL SISTEMA</div>
+              <div style={{ fontSize: 14, color: "#6b7785", marginTop: 2 }}>Elige tu área para iniciar sesión</div>
             </div>
             <nav style={{ padding: 8 }}>
               {ACCESOS.map(({ to, icon: Icon, t, d }) => (
@@ -141,7 +111,7 @@ export function GovHeader({ compact = false }) {
                     display: "flex",
                     alignItems: "center",
                     gap: 12,
-                    padding: "10px 12px",
+                    padding: "11px 12px",
                     borderRadius: 10,
                     textDecoration: "none",
                     color: C.ink,
@@ -150,21 +120,21 @@ export function GovHeader({ compact = false }) {
                   onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
                 >
                   <span style={{
-                    width: 36, height: 36, borderRadius: 10,
+                    width: 40, height: 40, borderRadius: 10, flexShrink: 0,
                     background: `${C.navy}12`, color: C.navy,
                     display: "flex", alignItems: "center", justifyContent: "center",
                   }}>
                     <Icon size={18} />
                   </span>
                   <span>
-                    <div style={{ fontSize: 13.5, fontWeight: 700, color: C.navy }}>{t}</div>
-                    <div style={{ fontSize: 11.5, color: "#6b7785" }}>{d}</div>
+                    <div style={{ fontSize: 15.5, fontWeight: 700, color: C.navy }}>{t}</div>
+                    <div style={{ fontSize: 13.5, color: "#6b7785" }}>{d}</div>
                   </span>
                 </Link>
               ))}
             </nav>
             <div style={{ padding: "10px 16px 14px", borderTop: `1px solid ${C.paperDim}` }}>
-              <Link to="/acceso" style={{ fontSize: 12, color: C.busBlue, fontWeight: 600, textDecoration: "none" }}>
+              <Link to="/acceso" style={{ fontSize: 14, color: C.busBlue, fontWeight: 600, textDecoration: "none" }}>
                 Ver todos los accesos →
               </Link>
             </div>
@@ -181,67 +151,67 @@ export function GovHeader({ compact = false }) {
   );
 }
 
-export function GovFooter() {
+export function GovFooter({ flush = false }) {
+  const titulo = { fontSize: 14, fontWeight: 700, letterSpacing: 0.8, marginBottom: 12, color: C.gold };
+  const texto = { fontSize: 15.5, lineHeight: 1.65, margin: 0, opacity: 0.94 };
   return (
-    <footer style={{ marginTop: 48 }}>
-      <PatternBar height={10} />
-      <div style={{ background: C.navy, color: "#fff", padding: "40px 28px 24px" }}>
+    <footer style={{ marginTop: flush ? 0 : 48 }}>
+      <div style={{ background: C.navy, color: "#fff", padding: "clamp(28px, 5vw, 44px) clamp(16px, 4vw, 28px) 28px" }}>
         <div style={{
-          maxWidth: 1100,
+          maxWidth: 1200,
           margin: "0 auto",
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(min(240px, 100%), 1fr))",
           gap: 32,
         }}>
           <div>
-            <BrandLogos variant="municipio" height={48} />
-            <p style={{ marginTop: 14, fontSize: 13, lineHeight: 1.5, opacity: 0.9, maxWidth: 260 }}>
+            <BrandLogos variant="municipio" onDark height="clamp(100px, 15vw, 132px)" />
+            <p style={{ marginTop: 14, fontSize: 15, lineHeight: 1.55, opacity: 0.92, maxWidth: 280 }}>
               H. Ayuntamiento de Calvillo · Movilidad Estudiantil Integral
             </p>
           </div>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 0.8, marginBottom: 12, color: C.gold }}>CONTACTO</div>
-            <p style={{ fontSize: 13, lineHeight: 1.6, margin: 0, opacity: 0.92 }}>
+            <div style={titulo}>CONTACTO</div>
+            <p style={texto}>
               Palacio Municipal s/n, Centro<br />
               Calvillo, Aguascalientes, C.P. 20800<br />
               (495) 956 0039
             </p>
           </div>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 0.8, marginBottom: 12, color: C.gold }}>PROGRAMA</div>
-            <p style={{ fontSize: 13, lineHeight: 1.6, margin: 0, opacity: 0.92 }}>
+            <div style={titulo}>PROGRAMA</div>
+            <p style={texto}>
               Beca de transporte estudiantil<br />
               Desarrollo Social · Finanzas<br />
-              <Link to="/ayuda" style={{ color: C.skyBlue }}>Ayuda y FAQ</Link>
+              <Link to="/ayuda" style={{ color: C.skyBlue, fontWeight: 600 }}>Ayuda y FAQ</Link>
             </p>
           </div>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 0.8, marginBottom: 12, color: C.gold }}>ATENCIÓN</div>
+            <div style={titulo}>ATENCIÓN</div>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <div style={{
                 background: "rgba(255,255,255,0.1)",
                 borderRadius: 12,
-                padding: "10px 14px",
-                fontSize: 12,
+                padding: "12px 16px",
+                fontSize: 14.5,
                 lineHeight: 1.35,
               }}>
-                <div style={{ fontWeight: 800, fontSize: 18, color: C.gold }}>Presidencia</div>
+                <div style={{ fontWeight: 800, fontSize: 21, color: C.gold }}>Presidencia</div>
                 Ventanilla de cobros
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div style={{
-        background: "#001a33",
-        color: "rgba(255,255,255,0.7)",
-        fontSize: 11,
-        padding: "12px 28px",
-        display: "flex",
-        justifyContent: "space-between",
-        flexWrap: "wrap",
-        gap: 8,
-      }}>
+      <div
+        className="foot-bottom"
+        style={{
+          background: "#001a33",
+          color: "rgba(255,255,255,0.78)",
+          fontSize: 13.5,
+          padding: "14px clamp(16px, 4vw, 28px)",
+        }}
+      >
         <span>© {new Date().getFullYear()} H. Ayuntamiento de Calvillo</span>
         <span>Sistema Digital de Beca de Transporte Estudiantil</span>
       </div>
@@ -278,10 +248,10 @@ export function A11yWidget() {
           borderRadius: 14,
           boxShadow: "0 12px 32px rgba(0,0,0,0.18)",
           padding: "14px 16px",
-          width: 240,
+          width: "min(280px, calc(100vw - 32px))",
           border: `1px solid ${C.paperDim}`,
         }}>
-          <div style={{ fontWeight: 700, color: C.navy, marginBottom: 10, fontSize: 14 }}>Opciones de accesibilidad</div>
+          <div style={{ fontWeight: 700, color: C.navy, marginBottom: 10, fontSize: 15.5 }}>Opciones de accesibilidad</div>
           {[
             { label: "Reducir tamaño de fuente", fn: () => fontDelta(-0.08), icon: <Minus size={14} /> },
             { label: "Incrementar tamaño de fuente", fn: () => fontDelta(0.08), icon: <Plus size={14} /> },
@@ -298,7 +268,7 @@ export function A11yWidget() {
                 display: "flex", alignItems: "center", gap: 8,
                 width: "100%", textAlign: "left", padding: "8px 6px",
                 border: "none", background: "transparent", cursor: "pointer",
-                fontSize: 13, color: C.ink, borderRadius: 8,
+                fontSize: 15, color: C.ink, borderRadius: 8,
               }}
             >
               {item.icon} {item.label}
@@ -323,7 +293,7 @@ export function A11yWidget() {
   );
 }
 
-export { ACCESOS, PatternBar };
+export { ACCESOS };
 
 /** Layout uniforme para pantallas internas (staff y alumno) */
 export function AppPage({
