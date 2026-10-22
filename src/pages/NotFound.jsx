@@ -1,0 +1,23 @@
+import React from "react";
+import { Link } from "react-router-dom";
+import { C } from "../theme";
+import { GovHeader, GovFooter, A11yWidget, Card, Btn } from "../components/GovShell";
+
+export default function NotFound() {
+  return (
+    <div style={{ minHeight: "100vh", background: C.paper, fontFamily: "system-ui, sans-serif" }}>
+      <GovHeader compact />
+      <main style={{ maxWidth: 480, margin: "48px auto", padding: 20 }}>
+        <Card style={{ textAlign: "center", padding: 32 }}>
+          <div style={{ fontSize: 48, fontWeight: 800, color: C.navy }}>404</div>
+          <p style={{ color: "#6b7785" }}>No encontramos esta página.</p>
+          <Link to="/" style={{ textDecoration: "none" }}>
+            <Btn>Volver al inicio</Btn>
+          </Link>
+        </Card>
+      </main>
+      <GovFooter />
+      <A11yWidget />
+    </div>
+  );
+}

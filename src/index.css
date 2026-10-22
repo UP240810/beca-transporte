@@ -1,0 +1,121 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #EEF1F4;
+  color: #1C2733;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.f-display {
+  font-family: 'Sora', system-ui, sans-serif;
+}
+
+.f-body {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.f-mono {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+button {
+  font-family: inherit;
+}
+
+input, select, textarea {
+  font-family: inherit;
+}
+
+a {
+  text-decoration: none;
+}
+
+/* ---- Layout responsivo: Recaudación y Ventanilla pasan a vista de
+   escritorio en pantallas grandes (>=900px); el resto de la app
+   se queda en el ancho de celular (430px) por diseño. ---- */
+.app-shell {
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+.app-shell.wide {
+  max-width: 430px;
+}
+
+@media (min-width: 900px) {
+  .app-shell.wide {
+    max-width: 1120px;
+  }
+}
+
+.split-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 900px) {
+  .split-layout {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+  .split-layout .split-left {
+    flex: 1;
+    min-width: 0;
+  }
+  .split-layout .split-right {
+    width: 400px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 20px;
+  }
+}
+
+
+
+/* Accesibilidad */
+body.a11y-bright { filter: contrast(1.15) brightness(1.08); }
+body.a11y-dark { filter: invert(1) hue-rotate(180deg); }
+body.a11y-gray { filter: grayscale(1); }
+body.a11y-dark img, body.a11y-dark video { filter: invert(1) hue-rotate(180deg); }
+
+/* Header solicitud link on wider screens */
+@media (min-width: 720px) {
+  .hdr-link-solicitud { display: inline-block !important; }
+}
+
+/* Uniformidad global del sistema */
+.app-shell, .app-shell.wide {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif !important;
+  color: #1C2733;
+}
+.app-shell header {
+  box-shadow: 0 2px 10px rgba(0, 51, 102, 0.1);
+}
+button:not(:disabled) {
+  transition: filter 0.15s ease, transform 0.1s ease;
+}
+button:not(:disabled):hover {
+  filter: brightness(1.05);
+}
+input, select, textarea {
+  font-family: inherit;
+}
+a {
+  color: #4078D1;
+}
