@@ -10,7 +10,7 @@ body {
 }
 
 #root {
-  min-height: 100vh;
+  min-height: calc(100vh / var(--app-zoom, 1));
 }
 
 .f-display {
@@ -88,11 +88,13 @@ a {
 
 
 
-/* Accesibilidad */
-body.a11y-bright { filter: contrast(1.15) brightness(1.08); }
-body.a11y-dark { filter: invert(1) hue-rotate(180deg); }
-body.a11y-gray { filter: grayscale(1); }
-body.a11y-dark img, body.a11y-dark video { filter: invert(1) hue-rotate(180deg); }
+/* Accesibilidad: los filtros van sobre #root (y sobre el propio widget, que vive
+   fuera de #root en un portal). Si fueran sobre body, el botón fixed se movía. */
+body.a11y-bright #root, body.a11y-bright .a11y-widget { filter: contrast(1.15) brightness(1.08); }
+body.a11y-dark #root, body.a11y-dark .a11y-widget { filter: invert(1) hue-rotate(180deg); }
+body.a11y-gray #root, body.a11y-gray .a11y-widget { filter: grayscale(1); }
+body.a11y-dark { background: #0d0d0d; }
+body.a11y-dark #root img, body.a11y-dark #root video { filter: invert(1) hue-rotate(180deg); }
 
 /* ---- Header / footer / landing responsivos ---- */
 html { -webkit-text-size-adjust: 100%; }
@@ -160,10 +162,45 @@ a {
 
 /* Páginas con header + footer: el footer siempre queda al fondo */
 .page-shell {
-  min-height: 100vh;
-  min-height: 100dvh;
+  min-height: calc(100vh / var(--app-zoom, 1));
+  min-height: calc(100dvh / var(--app-zoom, 1));
   display: flex;
   flex-direction: column;
 }
 .page-shell > main,
 .page-shell > .page-body { width: 100%; }
+
+/* ---- Animaciones de la página principal ---- */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes slide-left {
+  from { opacity: 0; transform: translateX(36px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-14px); }
+}
+.anim-up    { animation: fade-up 0.7s cubic-bezier(.2,.7,.2,1) both; }
+.anim-right { animation: slide-left 0.8s cubic-bezier(.2,.7,.2,1) 0.25s both; }
+.anim-float { animation: float-slow 7s ease-in-out infinite; }
+
+/* Aparece al hacer scroll */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s ease, transform 0.7s cubic-bezier(.2,.7,.2,1);
+  will-change: opacity, transform;
+}
+.reveal.in { opacity: 1; transform: none; }
+
+.lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.lift:hover { transform: translateY(-5px); box-shadow: 0 14px 28px rgba(0, 51, 102, 0.14) !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-up, .anim-right, .anim-float { animation: none; }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .lift:hover { transform: none; }
+}

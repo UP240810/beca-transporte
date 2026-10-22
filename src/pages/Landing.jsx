@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   FileText, ShieldCheck, Smartphone, Wallet, ChevronRight, Lock,
@@ -6,6 +6,40 @@ import {
 } from "lucide-react";
 import { C, INSCRIPCIONES } from "../theme";
 import { GovHeader, GovFooter, A11yWidget } from "../components/GovShell";
+
+/** Hace aparecer su contenido (fade + subida) cuando entra a la pantalla al hacer scroll. */
+function Reveal({ children, delay = 0, style, className = "" }) {
+  const ref = useRef(null);
+  const [visto, setVisto] = useState(
+    typeof IntersectionObserver === "undefined" ||
+      (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)
+  );
+
+  useEffect(() => {
+    if (visto || !ref.current) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setVisto(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -6% 0px" }
+    );
+    io.observe(ref.current);
+    return () => io.disconnect();
+  }, [visto]);
+
+  return (
+    <div
+      ref={ref}
+      className={`reveal${visto ? " in" : ""} ${className}`}
+      style={{ transitionDelay: `${delay}ms`, ...style }}
+    >
+      {children}
+    </div>
+  );
+}
 
 function estadoInscripcion() {
   const hoy = new Date();
@@ -28,17 +62,17 @@ function Hero() {
       padding: "clamp(32px, 6vw, 60px) clamp(16px, 4vw, 28px) clamp(36px, 6vw, 64px)",
     }}>
       {/* Formas decorativas */}
-      <div aria-hidden style={{
+      <div aria-hidden className="anim-float" style={{
         position: "absolute", right: -40, top: -40, width: 220, height: 220,
         borderRadius: "50%", background: "rgba(223,167,64,0.15)",
       }} />
-      <div aria-hidden style={{
+      <div aria-hidden className="anim-float" style={{ animationDelay: "-3s",
         position: "absolute", left: -60, bottom: -80, width: 280, height: 280,
         borderRadius: "50%", background: "rgba(164,211,238,0.1)",
       }} />
 
       <div style={{ maxWidth: 1200, margin: "0 auto", position: "relative", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(300px, 100%), 1fr))", gap: "clamp(24px, 4vw, 40px)", alignItems: "center" }}>
-        <div>
+        <div className="anim-up">
           <div style={{
             display: "inline-block", fontSize: 13, fontWeight: 700, letterSpacing: 1.2,
             padding: "6px 14px", borderRadius: 20, background: "rgba(223,167,64,0.25)", color: C.gold, marginBottom: 14,
@@ -78,7 +112,7 @@ function Hero() {
         </div>
 
         {/* Tarjeta de periodo */}
-        <div className="hero-card" style={{
+        <div className="hero-card anim-right" style={{
           background: "#fff", color: C.ink, borderRadius: 16, padding: "clamp(18px, 3vw, 26px)",
           boxShadow: "0 20px 40px rgba(0,0,0,0.2)", maxWidth: 440, width: "100%",
         }}>
@@ -123,15 +157,19 @@ function ComoFunciona() {
   ];
   return (
     <section style={{ maxWidth: 1200, margin: "0 auto", padding: "clamp(32px, 6vw, 56px) clamp(16px, 4vw, 28px)" }}>
-      <h2 style={{ textAlign: "center", color: C.navy, fontSize: "clamp(25px, 4vw, 32px)", fontWeight: 800, marginBottom: 8 }}>
-        ¿Cómo funciona?
-      </h2>
-      <p style={{ textAlign: "center", color: "#6b7785", fontSize: 16.5, marginBottom: 28, maxWidth: 560, marginInline: "auto" }}>
-        Cuatro pasos para formar parte del programa de beca de transporte.
-      </p>
+      <Reveal>
+        <h2 style={{ textAlign: "center", color: C.navy, fontSize: "clamp(25px, 4vw, 32px)", fontWeight: 800, marginBottom: 8 }}>
+          ¿Cómo funciona?
+        </h2>
+        <p style={{ textAlign: "center", color: "#6b7785", fontSize: 16.5, marginBottom: 28, maxWidth: 560, marginInline: "auto" }}>
+          Cuatro pasos para formar parte del programa de beca de transporte.
+        </p>
+      </Reveal>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(230px, 100%), 1fr))", gap: 16 }}>
         {pasos.map(({ icon: Icon, t, d }, i) => (
-          <div key={t} style={{
+          <Reveal key={t} delay={i * 110} style={{ display: "flex" }}>
+          <div className="lift" style={{
+            flex: 1,
             background: "#fff", borderRadius: 14, padding: 22,
             border: `1px solid ${C.paperDim}`,
             boxShadow: "0 4px 14px rgba(0,51,102,0.05)",
@@ -150,6 +188,7 @@ function ComoFunciona() {
             <div style={{ fontWeight: 750, color: C.navy, fontSize: 18, marginBottom: 6 }}>{t}</div>
             <div style={{ fontSize: 15.5, color: "#5b6675", lineHeight: 1.5 }}>{d}</div>
           </div>
+          </Reveal>
         ))}
       </div>
     </section>
@@ -186,16 +225,20 @@ function Servicios() {
   return (
     <section style={{ background: C.paper, padding: "clamp(32px, 6vw, 52px) clamp(16px, 4vw, 28px) clamp(36px, 6vw, 56px)" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        <h2 style={{ textAlign: "center", color: C.navy, fontSize: "clamp(24px, 3.6vw, 30px)", fontWeight: 800, marginBottom: 6 }}>
-          Servicios en línea
-        </h2>
-        <div style={{ width: 48, height: 3, background: C.gold, margin: "0 auto 24px", borderRadius: 2 }} />
+        <Reveal>
+          <h2 style={{ textAlign: "center", color: C.navy, fontSize: "clamp(24px, 3.6vw, 30px)", fontWeight: 800, marginBottom: 6 }}>
+            Servicios en línea
+          </h2>
+          <div style={{ width: 48, height: 3, background: C.gold, margin: "0 auto 24px", borderRadius: 2 }} />
+        </Reveal>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(250px, 100%), 1fr))", gap: 16 }}>
-          {cards.map((c) => (
+          {cards.map((c, i) => (
+            <Reveal key={c.to} delay={i * 110} style={{ display: "flex" }}>
             <Link
-              key={c.to}
               to={c.to}
+              className="lift"
               style={{
+                flex: 1,
                 textDecoration: "none",
                 borderRadius: 14,
                 overflow: "hidden",
@@ -205,7 +248,6 @@ function Servicios() {
                 display: "flex",
                 flexDirection: "column",
                 minHeight: 160,
-                transition: "transform 0.15s ease",
               }}
             >
               <div style={{ height: 6, background: c.color }} />
@@ -217,6 +259,7 @@ function Servicios() {
                 </div>
               </div>
             </Link>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -232,14 +275,14 @@ function FranjaGuayaba() {
       color: "#fff",
       textAlign: "center",
     }}>
-      <div style={{ maxWidth: 780, margin: "0 auto" }}>
+      <Reveal style={{ maxWidth: 780, margin: "0 auto" }}>
         <h2 style={{ fontSize: "clamp(24px, 3.6vw, 30px)", fontWeight: 800, margin: "0 0 12px", lineHeight: 1.25 }}>
           Un municipio que apuesta por sus estudiantes
         </h2>
         <p style={{ margin: 0, fontSize: "clamp(16px, 2vw, 18px)", opacity: 0.92, lineHeight: 1.55 }}>
           La beca de transporte acerca la escuela a más jóvenes: menos costo de traslado, más continuidad en los estudios.
         </p>
-      </div>
+      </Reveal>
     </section>
   );
 }

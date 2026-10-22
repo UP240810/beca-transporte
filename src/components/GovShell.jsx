@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Link, useLocation } from "react-router-dom";
 import {
   Menu, X, GraduationCap, ShieldCheck, Wallet, Bus, FileSpreadsheet,
@@ -32,16 +33,12 @@ export function GovHeader({ compact = false }) {
           className={compact ? "hdr-bar compact" : "hdr-bar"}
           style={{ background: C.navy, color: "#fff" }}
         >
-          <Link to="/" style={{ display: "flex", alignItems: "center", gap: 14, textDecoration: "none", color: "#fff", minWidth: 0 }}>
+          <Link to="/" aria-label="Gobierno de Calvillo, ir al inicio" style={{ display: "flex", alignItems: "center", textDecoration: "none", color: "#fff", minWidth: 0 }}>
             <BrandLogos
               variant="municipio"
               onDark
-              height={compact ? "clamp(52px, 8vw, 64px)" : "clamp(60px, 9vw, 80px)"}
+              height={compact ? "clamp(60px, 9vw, 76px)" : "clamp(68px, 10vw, 92px)"}
             />
-            <div className="hdr-brand-text" style={{ lineHeight: 1.2 }}>
-              <div style={{ fontSize: compact ? 16 : 19, fontWeight: 700, letterSpacing: 0.3 }}>CALVILLO</div>
-              <div style={{ fontSize: 13, opacity: 0.88, fontWeight: 500 }}>Gobierno Municipal · 2024-2027</div>
-            </div>
           </Link>
 
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
@@ -219,28 +216,70 @@ export function GovFooter({ flush = false }) {
   );
 }
 
+/* ---- Accesibilidad: tamaño de letra y contraste ----
+   El tamaño se aplica con `zoom` sobre #root (la app usa px, así que cambiar el
+   font-size del body no hacía nada). El contraste se aplica como filtro sobre
+   #root (no sobre body) para no romper el position:fixed del botón. */
+const A11Y_KEY = "a11y-prefs";
+const A11Y_MIN = 0.85;
+const A11Y_MAX = 1.4;
+const A11Y_MODES = ["a11y-bright", "a11y-dark", "a11y-gray"];
+
+function loadA11y() {
+  try {
+    const p = JSON.parse(localStorage.getItem(A11Y_KEY) || "{}");
+    const scale = Math.min(A11Y_MAX, Math.max(A11Y_MIN, Number(p.scale) || 1));
+    return { scale, mode: A11Y_MODES.includes(p.mode) ? p.mode : null };
+  } catch {
+    return { scale: 1, mode: null };
+  }
+}
+
+function applyA11y({ scale, mode }) {
+  if (typeof document === "undefined") return;
+  document.documentElement.style.setProperty("--app-zoom", String(scale));
+  const root = document.getElementById("root");
+  if (root) root.style.zoom = scale === 1 ? "" : String(scale);
+  document.body.classList.remove(...A11Y_MODES);
+  if (mode) document.body.classList.add(mode);
+}
+
+// Se aplica desde que carga la app, aunque la página no tenga el widget.
+applyA11y(loadA11y());
+
 /** Widget flotante de accesibilidad (inspirado en portales .gob.mx) */
 export function A11yWidget() {
   const [open, setOpen] = useState(false);
+  const [prefs, setPrefs] = useState(loadA11y);
 
-  function setRoot(varName, value) {
-    document.documentElement.style.setProperty(varName, value);
-  }
+  useEffect(() => {
+    applyA11y(prefs);
+    try {
+      if (prefs.scale === 1 && !prefs.mode) localStorage.removeItem(A11Y_KEY);
+      else localStorage.setItem(A11Y_KEY, JSON.stringify(prefs));
+    } catch { /* sin storage: no pasa nada */ }
+  }, [prefs]);
 
-  function fontDelta(delta) {
-    const cur = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--app-font-scale") || "1");
-    const next = Math.min(1.35, Math.max(0.85, cur + delta));
-    setRoot("--app-font-scale", String(next));
-    document.body.style.fontSize = `${next * 100}%`;
-  }
+  const cambiarFuente = (delta) =>
+    setPrefs((p) => ({
+      ...p,
+      scale: Math.min(A11Y_MAX, Math.max(A11Y_MIN, Math.round((p.scale + delta) * 100) / 100)),
+    }));
+  const setModo = (mode) => setPrefs((p) => ({ ...p, mode: p.mode === mode ? null : mode }));
 
-  function contrast(mode) {
-    document.body.classList.remove("a11y-bright", "a11y-dark", "a11y-gray");
-    if (mode) document.body.classList.add(mode);
-  }
+  const opciones = [
+    { label: "Reducir tamaño de fuente", fn: () => cambiarFuente(-0.1), icon: <Minus size={16} />, off: prefs.scale <= A11Y_MIN },
+    { label: "Incrementar tamaño de fuente", fn: () => cambiarFuente(0.1), icon: <Plus size={16} />, off: prefs.scale >= A11Y_MAX },
+    { label: "Contraste brillante", fn: () => setModo("a11y-bright"), icon: <Contrast size={16} />, on: prefs.mode === "a11y-bright" },
+    { label: "Contraste obscuro", fn: () => setModo("a11y-dark"), icon: <Contrast size={16} />, on: prefs.mode === "a11y-dark" },
+    { label: "Escala de grises", fn: () => setModo("a11y-gray"), icon: <Contrast size={16} />, on: prefs.mode === "a11y-gray" },
+    { label: "Reiniciar", fn: () => setPrefs({ scale: 1, mode: null }), icon: <RotateCcw size={16} /> },
+  ];
 
-  return (
-    <div style={{ position: "fixed", left: 16, bottom: 20, zIndex: 70 }}>
+  // Va en un portal a <body>: así no le afectan el zoom ni los filtros de #root
+  // (un filtro en un ancestro mueve el position:fixed y el botón "desaparecía").
+  return createPortal(
+    <div className={`a11y-widget${prefs.mode ? " " + prefs.mode : ""}`} style={{ position: "fixed", left: 16, bottom: 20, zIndex: 70 }}>
       {open && (
         <div style={{
           marginBottom: 10,
@@ -248,27 +287,26 @@ export function A11yWidget() {
           borderRadius: 14,
           boxShadow: "0 12px 32px rgba(0,0,0,0.18)",
           padding: "14px 16px",
-          width: "min(280px, calc(100vw - 32px))",
+          width: "min(290px, calc(100vw - 32px))",
           border: `1px solid ${C.paperDim}`,
         }}>
-          <div style={{ fontWeight: 700, color: C.navy, marginBottom: 10, fontSize: 15.5 }}>Opciones de accesibilidad</div>
-          {[
-            { label: "Reducir tamaño de fuente", fn: () => fontDelta(-0.08), icon: <Minus size={14} /> },
-            { label: "Incrementar tamaño de fuente", fn: () => fontDelta(0.08), icon: <Plus size={14} /> },
-            { label: "Contraste brillante", fn: () => contrast("a11y-bright"), icon: <Contrast size={14} /> },
-            { label: "Contraste obscuro", fn: () => contrast("a11y-dark"), icon: <Contrast size={14} /> },
-            { label: "Escala de grises", fn: () => contrast("a11y-gray"), icon: <Contrast size={14} /> },
-            { label: "Reiniciar contraste", fn: () => { contrast(null); fontDelta(0); setRoot("--app-font-scale", "1"); document.body.style.fontSize = ""; }, icon: <RotateCcw size={14} /> },
-          ].map((item) => (
+          <div style={{ fontWeight: 700, color: C.navy, marginBottom: 4, fontSize: 16 }}>Opciones de accesibilidad</div>
+          <div style={{ fontSize: 13.5, color: "#6b7785", marginBottom: 8 }}>
+            Tamaño de letra: {Math.round(prefs.scale * 100)}%
+          </div>
+          {opciones.map((item) => (
             <button
               key={item.label}
               type="button"
               onClick={item.fn}
+              disabled={item.off}
+              aria-pressed={item.on === undefined ? undefined : item.on}
               style={{
-                display: "flex", alignItems: "center", gap: 8,
-                width: "100%", textAlign: "left", padding: "8px 6px",
-                border: "none", background: "transparent", cursor: "pointer",
-                fontSize: 15, color: C.ink, borderRadius: 8,
+                display: "flex", alignItems: "center", gap: 10,
+                width: "100%", textAlign: "left", padding: "9px 8px",
+                border: "none", background: item.on ? `${C.busBlue}1f` : "transparent",
+                cursor: item.off ? "not-allowed" : "pointer", opacity: item.off ? 0.45 : 1,
+                fontSize: 15, color: item.on ? C.navy : C.ink, fontWeight: item.on ? 700 : 400, borderRadius: 8,
               }}
             >
               {item.icon} {item.label}
@@ -279,6 +317,7 @@ export function A11yWidget() {
       <button
         type="button"
         aria-label="Accesibilidad"
+        aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
         style={{
           width: 52, height: 52, borderRadius: "50%",
@@ -289,7 +328,8 @@ export function A11yWidget() {
       >
         <Accessibility size={24} />
       </button>
-    </div>
+    </div>,
+    document.body
   );
 }
 
