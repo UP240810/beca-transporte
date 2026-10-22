@@ -17,7 +17,7 @@ const accesos = [
 
 export default function Acceso() {
   return (
-    <div className="page-shell" style={{ background: C.paper, fontFamily: "system-ui, sans-serif", color: C.ink }}>
+    <div className="page-shell" style={{ background: C.paper, fontFamily: "var(--font-sans)", color: C.ink }}>
       <GovHeader compact />
       <main style={{ maxWidth: 960, margin: "0 auto", padding: "clamp(24px, 5vw, 44px) clamp(16px, 4vw, 24px) 48px" }}>
         <h1 style={{ fontSize: "clamp(26px, 4vw, 32px)", fontWeight: 800, color: C.navy, margin: "0 0 8px" }}>Accesos al sistema</h1>

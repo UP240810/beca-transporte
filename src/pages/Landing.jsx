@@ -88,22 +88,22 @@ function Hero() {
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 26 }}>
             {insc.abierto ? (
-              <Link to="/solicitud" style={{
-                padding: "14px 26px", borderRadius: 12, background: C.gold, color: C.navy,
+              <Link to="/solicitud" className="btn-anim" style={{
+                padding: "14px 26px", borderRadius: 8, background: C.gold, color: C.navy,
                 fontWeight: 800, fontSize: 17, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6,
               }}>
                 <ChevronRight size={18} /> Inscribirme ahora
               </Link>
             ) : (
               <span style={{
-                padding: "14px 26px", borderRadius: 12, background: "rgba(255,255,255,0.12)",
+                padding: "14px 26px", borderRadius: 8, background: "rgba(255,255,255,0.12)",
                 fontWeight: 700, fontSize: 17, display: "inline-flex", alignItems: "center", gap: 6,
               }}>
                 <Lock size={16} /> {insc.texto}
               </span>
             )}
-            <Link to="/ayuda" style={{
-              padding: "14px 26px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.5)",
+            <Link to="/ayuda" className="btn-anim" style={{
+              padding: "14px 26px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.5)",
               color: "#fff", fontWeight: 600, fontSize: 17, textDecoration: "none",
             }}>
               Ayuda y FAQ
@@ -113,8 +113,8 @@ function Hero() {
 
         {/* Tarjeta de periodo */}
         <div className="hero-card anim-right" style={{
-          background: "#fff", color: C.ink, borderRadius: 16, padding: "clamp(18px, 3vw, 26px)",
-          boxShadow: "0 20px 40px rgba(0,0,0,0.2)", maxWidth: 440, width: "100%",
+          background: "#fff", color: C.ink, borderRadius: 8, padding: "clamp(18px, 3vw, 26px)",
+          boxShadow: "rgba(30,30,44,0.15) 24px 48px 64px 0px, rgb(255,255,255) 0px 0px 0px 1px inset", maxWidth: 440, width: "100%",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
             <FileText size={18} color={C.busBlue} />
@@ -170,9 +170,9 @@ function ComoFunciona() {
           <Reveal key={t} delay={i * 110} style={{ display: "flex" }}>
           <div className="lift" style={{
             flex: 1,
-            background: "#fff", borderRadius: 14, padding: 22,
+            background: "#fff", borderRadius: 8, padding: 22,
             border: `1px solid ${C.paperDim}`,
-            boxShadow: "0 4px 14px rgba(0,51,102,0.05)",
+            boxShadow: "rgba(18,22,30,0.024) 0px 1px 4px 0px, rgba(18,22,30,0.05) 0px 1px 0px 0px, rgba(18,22,30,0.024) 0px 0px 0px 1px",
             position: "relative",
           }}>
             <div style={{
@@ -180,7 +180,7 @@ function ComoFunciona() {
               color: `${C.navy}14`, lineHeight: 1,
             }}>{i + 1}</div>
             <div style={{
-              width: 48, height: 48, borderRadius: 12, background: `${C.busBlue}18`,
+              width: 48, height: 48, borderRadius: 8, background: `${C.busBlue}18`,
               display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12,
             }}>
               <Icon size={24} color={C.busBlue} />
@@ -240,10 +240,10 @@ function Servicios() {
               style={{
                 flex: 1,
                 textDecoration: "none",
-                borderRadius: 14,
+                borderRadius: 8,
                 overflow: "hidden",
                 background: "#fff",
-                boxShadow: "0 6px 18px rgba(0,51,102,0.08)",
+                boxShadow: "rgba(18,22,30,0.024) 0px 1px 4px 0px, rgba(18,22,30,0.05) 0px 1px 0px 0px, rgba(18,22,30,0.024) 0px 0px 0px 1px",
                 border: `1px solid ${C.paperDim}`,
                 display: "flex",
                 flexDirection: "column",
@@ -289,7 +289,7 @@ function FranjaGuayaba() {
 
 export default function Landing() {
   return (
-    <div style={{ minHeight: "100vh", background: "#fff", fontFamily: "system-ui, -apple-system, 'Segoe UI', sans-serif", color: C.ink }}>
+    <div style={{ minHeight: "100vh", background: "#fff", fontFamily: "var(--font-sans)", color: C.ink }}>
       <GovHeader />
       <Hero />
       <ComoFunciona />

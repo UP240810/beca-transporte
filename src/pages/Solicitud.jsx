@@ -477,7 +477,39 @@ export default function Solicitud() {
                 <button type="button" onClick={() => setFoto(null)} style={{ border: "none", background: "none", color: C.garnet, fontSize: 15.1, cursor: "pointer" }}><XIcon size={14} /> Quitar</button>
               </div>
             ) : (
-              <input type="file" accept="image/*" onChange={handleFoto} disabled={comprimiendoFoto} />
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
+                <label style={{
+                  display: "inline-flex", alignItems: "center", gap: 6,
+                  padding: "8px 14px", borderRadius: 8, border: `1px solid ${C.navy}`,
+                  background: C.navy, color: "#fff", fontSize: 14, fontWeight: 600, cursor: comprimiendoFoto ? "default" : "pointer",
+                }}>
+                  <Camera size={16} />
+                  Tomar foto
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={handleFoto}
+                    disabled={comprimiendoFoto}
+                    style={{ display: "none" }}
+                  />
+                </label>
+                <label style={{
+                  display: "inline-flex", alignItems: "center", gap: 6,
+                  padding: "8px 14px", borderRadius: 8, border: `1px solid ${C.paperDim}`,
+                  background: "#fff", color: C.navy, fontSize: 14, fontWeight: 600, cursor: comprimiendoFoto ? "default" : "pointer",
+                }}>
+                  Subir imagen
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFoto}
+                    disabled={comprimiendoFoto}
+                    style={{ display: "none" }}
+                  />
+                </label>
+                {comprimiendoFoto && <span style={{ fontSize: 13, color: "#6b7785" }}>Procesando…</span>}
+              </div>
             )}
             {errorFoto && <div style={{ color: C.garnet, fontSize: 13.9 }}>{errorFoto}</div>}
           </Field>

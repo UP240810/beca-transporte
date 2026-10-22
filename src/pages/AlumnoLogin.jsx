@@ -28,7 +28,7 @@ export default function AlumnoLogin() {
   }
 
   return (
-    <div className="page-shell" style={{ background: C.paper, fontFamily: "system-ui, sans-serif" }}>
+    <div className="page-shell" style={{ background: C.paper, fontFamily: "var(--font-sans)" }}>
       <GovHeader compact />
       <main style={{ maxWidth: 480, margin: "0 auto", padding: "clamp(24px, 6vw, 56px) 20px" }}>
         <Card style={{ padding: "clamp(20px, 4vw, 32px)" }}>

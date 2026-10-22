@@ -2,8 +2,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { C } from "../theme";
 import { GovHeader, GovFooter, A11yWidget } from "../components/GovShell";
+import guayaba from "../assets/guayaba.png";
 
-/** Página 400 — animación de guayaba (símbolo local de Calvillo) */
+/** Página 400 — guayaba (PNG) con animación de escala */
 export default function BadRequest() {
   return (
     <div style={{ minHeight: "100vh", background: C.paper, display: "flex", flexDirection: "column" }}>
@@ -19,9 +20,14 @@ export default function BadRequest() {
           maxWidth: 420,
           width: "100%",
         }}>
-          <div className="guayaba-bounce" aria-hidden style={{ fontSize: 72, lineHeight: 1, marginBottom: 12 }}>
-            🍈
-          </div>
+          <img
+            src={guayaba}
+            alt=""
+            className="guayaba-pulse"
+            width={88}
+            height={88}
+            style={{ marginBottom: 12, display: "inline-block" }}
+          />
           <div style={{ fontSize: 48, fontWeight: 800, color: C.navy, letterSpacing: -1 }}>400</div>
           <p style={{ color: C.ink, fontSize: 18, fontWeight: 600, margin: "8px 0 6px" }}>
             Hay un error en la solicitud
@@ -49,16 +55,15 @@ export default function BadRequest() {
       <GovFooter />
       <A11yWidget />
       <style>{`
-        @keyframes guayaba-bounce {
-          0%, 100% { transform: translateY(0) rotate(-4deg); }
-          50% { transform: translateY(-14px) rotate(4deg); }
+        @keyframes guayaba-pulse {
+          0%, 100% { transform: scale(0.9); }
+          50% { transform: scale(1.1); }
         }
-        .guayaba-bounce {
-          animation: guayaba-bounce 1.4s ease-in-out infinite;
-          display: inline-block;
+        .guayaba-pulse {
+          animation: guayaba-pulse 1.2s ease-in-out infinite;
         }
         @media (prefers-reduced-motion: reduce) {
-          .guayaba-bounce { animation: none; }
+          .guayaba-pulse { animation: none; }
         }
       `}</style>
     </div>

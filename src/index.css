@@ -2,27 +2,58 @@
   box-sizing: border-box;
 }
 
+/* Estilo Column adaptado: tipografía Inter (SuisseIntl), radios 8px, sombras suaves.
+   Paleta Calvillo se conserva en theme.js. */
+:root {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --radius-ui: 8px;
+  --shadow-card: rgba(18, 22, 30, 0.024) 0px 1px 4px 0px, rgba(18, 22, 30, 0.05) 0px 1px 0px 0px, rgba(18, 22, 30, 0.024) 0px 0px 0px 1px;
+  --shadow-elevated: rgba(0, 0, 0, 0.02) 0px 40px 32px 0px, rgba(0, 0, 0, 0.03) 0px 22px 18px 0px, rgba(0, 0, 0, 0.03) 0px 12px 10px 0px, rgba(0, 0, 0, 0.04) 0px 7px 5px 0px, rgba(0, 0, 0, 0.07) 0px 3px 2px 0px;
+  --shadow-btn: rgba(0, 51, 102, 0.1) 0px 1px 3px 0px, rgba(0, 51, 102, 0.05) 0px 1px 0px 0px;
+}
+
 body {
   margin: 0;
-  background: #EEF1F4;
+  background: #F7F8FA;
   color: #1C2733;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
   min-height: calc(100vh / var(--app-zoom, 1));
+  font-family: var(--font-sans);
 }
 
+/* Títulos: Inter semibold + tracking editorial (Column) */
 .f-display {
-  font-family: 'Sora', system-ui, sans-serif;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
 }
 
 .f-body {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.5;
 }
 
 .f-mono {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
 }
 
 .spin {
@@ -106,9 +137,9 @@ img { max-width: 100%; }
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px max(clamp(14px, 3vw, 32px), calc((100% - 1200px) / 2));
+  padding: 14px max(clamp(14px, 3vw, 32px), calc((100% - 1200px) / 2));
 }
-.hdr-bar.compact { padding-top: 8px; padding-bottom: 8px; }
+.hdr-bar.compact { padding-top: 10px; padding-bottom: 10px; }
 .hdr-link-solicitud {
   display: inline-block;
   font-size: 15px;
@@ -139,9 +170,9 @@ img { max-width: 100%; }
   .foot-bottom { padding-bottom: 76px !important; }
 }
 
-/* Uniformidad global del sistema */
-.app-shell, .app-shell.wide {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif !important;
+/* Uniformidad global del sistema — Inter (Column) */
+.app-shell, .app-shell.wide, .page-shell {
+  font-family: var(--font-sans) !important;
   color: #1C2733;
 }
 .app-shell header {
@@ -235,4 +266,72 @@ a {
 
 button, .btn-primary {
   border-radius: 8px;
+}
+
+
+/* ---- Animaciones UI ---- */
+a.btn-anim, button.btn-anim, .btn-anim {
+  transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease, opacity 0.22s ease;
+}
+a.btn-anim:hover, button.btn-anim:hover, .btn-anim:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 20px rgba(0, 51, 102, 0.18);
+}
+a.btn-anim:active, button.btn-anim:active, .btn-anim:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Botones principales del header / hero */
+.hdr-link-solicitud {
+  transition: transform 0.22s ease, background 0.22s ease, box-shadow 0.22s ease !important;
+}
+.hdr-link-solicitud:hover {
+  transform: translateY(-2px) scale(1.04);
+  background: rgba(255,255,255,0.12);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
+
+/* Reveal al scroll — más notorio */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1), transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.lift {
+  transition: box-shadow 0.25s ease, transform 0.25s ease !important;
+}
+.lift:hover {
+  box-shadow: 0 12px 28px rgba(0, 51, 102, 0.12) !important;
+  transform: translateY(-4px) !important;
+}
+
+@keyframes anim-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes anim-right {
+  from { opacity: 0; transform: translateX(28px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.anim-up { animation: anim-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.anim-right { animation: anim-right 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both; }
+
+@media (prefers-reduced-motion: reduce) {
+  a.btn-anim:hover, button.btn-anim:hover, .btn-anim:hover,
+  .hdr-link-solicitud:hover, .lift:hover {
+    transform: none !important;
+  }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .anim-up, .anim-right { animation: none; }
+}
+
+
+/* Column radius defaults */
+button, input, select, textarea, .card-col {
+  border-radius: var(--radius-ui);
 }

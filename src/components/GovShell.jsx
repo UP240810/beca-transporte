@@ -37,7 +37,7 @@ export function GovHeader({ compact = false }) {
             <BrandLogos
               variant="municipio"
               onDark
-              height={compact ? "clamp(60px, 9vw, 76px)" : "clamp(68px, 10vw, 92px)"}
+              height={compact ? "clamp(80px, 12vw, 104px)" : "clamp(96px, 14vw, 128px)"}
             />
           </Link>
 
@@ -63,7 +63,7 @@ export function GovHeader({ compact = false }) {
               style={{
                 width: 48,
                 height: 48,
-                borderRadius: 12,
+                borderRadius: 8,
                 border: "none",
                 background: menuOpen ? C.gold : "rgba(255,255,255,0.12)",
                 color: menuOpen ? C.navy : "#fff",
@@ -88,7 +88,7 @@ export function GovHeader({ compact = false }) {
               marginTop: 8,
               width: "min(380px, calc(100vw - 24px))",
               background: "#fff",
-              borderRadius: 14,
+              borderRadius: 8,
               boxShadow: "0 16px 40px rgba(0,51,102,0.2)",
               border: `1px solid ${C.paperDim}`,
               overflow: "hidden",
@@ -188,6 +188,7 @@ export function GovFooter({ flush = false }) {
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <Link
                 to="/ayuda"
+                className="btn-anim"
                 style={{
                   background: "rgba(255,255,255,0.1)",
                   borderRadius: 8,
@@ -299,7 +300,7 @@ export function A11yWidget() {
         <div style={{
           marginBottom: 10,
           background: "#fff",
-          borderRadius: 14,
+          borderRadius: 8,
           boxShadow: "0 12px 32px rgba(0,0,0,0.18)",
           padding: "14px 16px",
           width: "min(290px, calc(100vw - 32px))",
@@ -365,7 +366,7 @@ export function AppPage({
     <div style={{
       minHeight: "100vh",
       background: C.paper,
-      fontFamily: "system-ui, -apple-system, 'Segoe UI', sans-serif",
+      fontFamily: "var(--font-sans)",
       color: C.ink,
       display: "flex",
       flexDirection: "column",
@@ -438,9 +439,9 @@ export function Card({ children, style = {} }) {
   return (
     <div style={{
       background: "#fff",
-      borderRadius: 14,
+      borderRadius: 8,
       border: `1px solid ${C.paperDim}`,
-      boxShadow: "0 4px 14px rgba(0,51,102,0.06)",
+      boxShadow: "rgba(18,22,30,0.024) 0px 1px 4px 0px, rgba(18,22,30,0.05) 0px 1px 0px 0px, rgba(18,22,30,0.024) 0px 0px 0px 1px",
       padding: 16,
       ...style,
     }}>

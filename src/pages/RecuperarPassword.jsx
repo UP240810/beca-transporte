@@ -28,7 +28,7 @@ export default function RecuperarPassword() {
   }
 
   return (
-    <div className="page-shell" style={{ background: C.paper || "#F7F8FA", fontFamily: "system-ui, sans-serif" }}>
+    <div className="page-shell" style={{ background: C.paper || "#F7F8FA", fontFamily: "var(--font-sans)" }}>
       <GovHeader compact />
       <div className="page-body" style={{ maxWidth: 480, margin: "0 auto", padding: "32px 18px" }}>
         <header style={{ background: "#fff", borderBottom: `3px solid ${C.navy}`, padding: "12px 16px", display: "flex", alignItems: "center", gap: 12, borderRadius: 10 }}>

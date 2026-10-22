@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { C } from "../theme";
+import guayaba from "../assets/guayaba.png";
 
-/** Animación de carga al iniciar la página (guayaba + barra). */
+/** Animación de carga al iniciar la página (guayaba PNG: escala grande ↔ pequeña). */
 export default function PageLoader() {
   const [show, setShow] = useState(true);
   const [fade, setFade] = useState(false);
@@ -42,7 +43,14 @@ export default function PageLoader() {
         pointerEvents: fade ? "none" : "auto",
       }}
     >
-      <div className="loader-guayaba" style={{ fontSize: 56, marginBottom: 16 }}>🍈</div>
+      <img
+        src={guayaba}
+        alt=""
+        className="loader-guayaba"
+        width={96}
+        height={96}
+        style={{ marginBottom: 16, display: "block" }}
+      />
       <div style={{ fontWeight: 700, color: C.navy, fontSize: 16, marginBottom: 12 }}>
         Cargando…
       </div>
@@ -62,14 +70,14 @@ export default function PageLoader() {
       </div>
       <style>{`
         @keyframes loader-guayaba {
-          0%, 100% { transform: scale(1) rotate(-6deg); }
-          50% { transform: scale(1.08) rotate(6deg); }
+          0%, 100% { transform: scale(0.88); }
+          50% { transform: scale(1.12); }
         }
         @keyframes loader-bar {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(300%); }
         }
-        .loader-guayaba { animation: loader-guayaba 1.2s ease-in-out infinite; }
+        .loader-guayaba { animation: loader-guayaba 1.1s ease-in-out infinite; }
         .loader-bar { animation: loader-bar 1s ease-in-out infinite; }
         @media (prefers-reduced-motion: reduce) {
           .loader-guayaba, .loader-bar { animation: none; }
