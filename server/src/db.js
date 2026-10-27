@@ -97,17 +97,28 @@ db.exec(`
 })();
 
 
-(function migrarRolContabilidad() {
+// Roles completos del sistema (incluye desarrollo_social y admin_transportistas)
+(function migrarRolesCompletos() {
   try {
     const row = db.prepare(`SELECT sql FROM sqlite_master WHERE type='table' AND name='usuarios'`).get();
-    if (!row || !row.sql || row.sql.includes("'contabilidad'")) return;
+    // Si ya incluye desarrollo_social, no hace falta migrar
+    if (!row || !row.sql || row.sql.includes("'desarrollo_social'")) return;
+
     db.exec("BEGIN");
     db.exec(`
       CREATE TABLE usuarios_mig (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         usuario TEXT NOT NULL UNIQUE,
         password_hash TEXT NOT NULL,
-        rol TEXT NOT NULL CHECK (rol IN ('alumno', 'recaudacion', 'ventanilla', 'camionero', 'contabilidad')),
+        rol TEXT NOT NULL CHECK (rol IN (
+          'alumno',
+          'recaudacion',
+          'ventanilla',
+          'camionero',
+          'contabilidad',
+          'desarrollo_social',
+          'admin_transportistas'
+        )),
         nombre TEXT,
         activo INTEGER NOT NULL DEFAULT 1,
         creado_en TEXT NOT NULL DEFAULT (datetime('now'))
@@ -118,10 +129,10 @@ db.exec(`
       ALTER TABLE usuarios_mig RENAME TO usuarios;
     `);
     db.exec("COMMIT");
-    console.log("Migración: rol contabilidad habilitado");
+    console.log("Migración: roles desarrollo_social y admin_transportistas habilitados");
   } catch (e) {
     try { db.exec("ROLLBACK"); } catch (_) {}
-    console.warn("Migración contabilidad:", e.message);
+    console.warn("Migración roles:", e.message);
   }
 })();
 

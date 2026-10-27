@@ -195,6 +195,76 @@ function ComoFunciona() {
   );
 }
 
+function VideoPromo() {
+  return (
+    <section
+      style={{
+        maxWidth: 1200,
+        margin: "0 auto",
+        padding: "0 clamp(16px, 4vw, 28px) clamp(28px, 5vw, 48px)",
+      }}
+    >
+      <Reveal>
+        <h2
+          style={{
+            textAlign: "center",
+            color: C.navy,
+            fontSize: "clamp(22px, 3.6vw, 28px)",
+            fontWeight: 800,
+            marginBottom: 8,
+          }}
+        >
+          Conoce Pase Calvillo
+        </h2>
+        <p
+          style={{
+            textAlign: "center",
+            color: "#6b7785",
+            fontSize: 16,
+            marginBottom: 20,
+            maxWidth: 520,
+            marginInline: "auto",
+          }}
+        >
+          En 21 segundos: cómo solicitar, recargar y viajar con tu beca de transporte.
+        </p>
+      </Reveal>
+      <Reveal delay={80}>
+        <div
+          style={{
+            borderRadius: 12,
+            overflow: "hidden",
+            border: `1px solid ${C.paperDim}`,
+            boxShadow:
+              "rgba(18,22,30,0.06) 0px 4px 16px 0px, rgba(18,22,30,0.04) 0px 1px 0px 0px",
+            background: "#0a0a0a",
+            maxWidth: 900,
+            margin: "0 auto",
+            aspectRatio: "16 / 9",
+          }}
+        >
+          <video
+            src="/pase_calvillo_21s.mp4"
+            controls
+            playsInline
+            preload="metadata"
+            poster=""
+            style={{
+              display: "block",
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              background: "#f5f0e6",
+            }}
+          >
+            Tu navegador no soporta video HTML5.
+          </video>
+        </div>
+      </Reveal>
+    </section>
+  );
+}
+
 function Servicios() {
   const cards = [
     {
@@ -293,6 +363,7 @@ export default function Landing() {
       <GovHeader />
       <Hero />
       <ComoFunciona />
+      <VideoPromo />
       <Servicios />
       <FranjaGuayaba />
       <GovFooter flush />
