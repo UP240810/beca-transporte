@@ -5,7 +5,7 @@ import {
   FileSpreadsheet, Ban, RefreshCw, UserX, UserCheck,
 } from "lucide-react";
 import { C } from "../theme";
-import { StaffHeader, A11yWidget } from "../components/GovShell";
+import { StaffLayout } from "../components/GovShell";
 import { useStaffSesion } from "../context/StaffSesionContext";
 import api from "../api";
 import BrandLogos from "../components/BrandLogos";
@@ -233,14 +233,11 @@ export default function AdminAlumnos() {
   }
 
   return (
-    <div style={{ maxWidth: 430, margin: "0 auto", minHeight: 640, background: C.paper }}>
-      <StaffHeader
+    <StaffLayout
         title="Beneficiarios"
         variant="desarrollo"
         userLabel={staff?.nombre}
-        onLogout={() => { logout(); navigate("/acceso"); }}
-      />
-      <A11yWidget />
+        onLogout={() => { logout(); navigate("/acceso"); }} maxWidth={1200}>
 
       <div style={{ padding: 16 }}>
         <div className="f-display" style={{ fontSize: 16, fontWeight: 700, color: C.navy, marginBottom: 3 }}>Alumnos</div>
@@ -292,6 +289,6 @@ export default function AdminAlumnos() {
           )}
         </div>
       </div>
-    </div>
+    </StaffLayout>
   );
 }

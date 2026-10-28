@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { SesionProvider } from "./context/SesionContext";
 import { StaffSesionProvider } from "./context/StaffSesionContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -37,6 +38,7 @@ export default function App() {
         <BrowserRouter>
           <PageLoader />
           <ConsentModal />
+          <ErrorBoundary>
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/acceso" element={<Acceso />} />
@@ -139,6 +141,7 @@ export default function App() {
             {/* 404 */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </ErrorBoundary>
         </BrowserRouter>
       </StaffSesionProvider>
     </SesionProvider>

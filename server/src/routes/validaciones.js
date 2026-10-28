@@ -10,6 +10,7 @@ const MENSAJES = {
   "ruta-incorrecta": "Ruta incorrecta. Este estudiante no tiene descuento en la ruta de este turno.",
   "sin-saldo": "Saldo insuficiente. El estudiante debe recargar en la Presidencia Municipal.",
   revocado: "Pase revocado o alumno dado de baja. No se permite el viaje.",
+  "pase-usado": "Este pase ya fue utilizado. El estudiante debe abrir su app y mostrar el pase nuevo.",
 };
 
 function rutasDelAlumno(alumnoId) {
@@ -24,7 +25,7 @@ function rutasDelAlumno(alumnoId) {
 
 // POST /api/validaciones  { qrToken } o { matricula }, { rutaId }
 router.post("/", authRequired(["camionero"]), (req, res) => {
-  const { qrToken, matricula: matriculaDirecta, rutaId } = req.body;
+  const { qrToken, matricula: matriculaDirecta, rutaId, escaneadoEn } = req.body;
   if ((!qrToken && !matriculaDirecta) || !rutaId) {
     return res.status(400).json({ error: "Faltan datos del escaneo." });
   }
@@ -32,10 +33,13 @@ router.post("/", authRequired(["camionero"]), (req, res) => {
   let matricula = matriculaDirecta;
   let viaManual = true;
   let versionEnToken = null;
+  let jti = null;
 
   if (qrToken) {
     try {
-      const payload = verificarPaseQR(qrToken);
+      // escaneadoEn: validaciones hechas sin señal que se envían después
+      const payload = verificarPaseQR(qrToken, { escaneadoEn });
+      jti = payload.jti || null;
       matricula = payload.matricula;
       versionEnToken = payload.v != null ? Number(payload.v) : 1;
       viaManual = false;
@@ -81,6 +85,23 @@ router.post("/", authRequired(["camionero"]), (req, res) => {
     }
   }
 
+  // Pase de un solo uso: cada QR trae un identificador único (jti) que solo se acepta una vez.
+  if (!viaManual) {
+    const respuestaPase = (mensaje) => res.json({
+      resultado: "pase-usado",
+      mensaje,
+      viaManual,
+      alumno: alumnoPayload(),
+      rutaTurno: rutaTurno ? { id: rutaTurno.id, nombre: rutaTurno.nombre, codigo: rutaTurno.codigo } : null,
+    });
+    if (!jti) {
+      return respuestaPase("Este QR es de una versión anterior y ya no sirve. El estudiante debe abrir su app para obtener un pase nuevo.");
+    }
+    if (db.prepare(`SELECT 1 FROM pases_usados WHERE jti = ?`).get(jti)) {
+      return respuestaPase(MENSAJES["pase-usado"]);
+    }
+  }
+
   const tieneRuta = db.prepare(
     `SELECT 1 FROM alumno_rutas WHERE alumno_id = ? AND ruta_id = ?`
   ).get(alumno.id, rutaId);
@@ -95,6 +116,10 @@ router.post("/", authRequired(["camionero"]), (req, res) => {
   }
 
   const registrar = db.transaction(() => {
+    // Se consume primero: si otro escaneo ganó la carrera, la restricción UNIQUE aborta todo.
+    if (resultado === "valido" && jti) {
+      db.prepare(`INSERT INTO pases_usados (jti, alumno_id, ruta_id) VALUES (?, ?, ?)`).run(jti, alumno.id, rutaId);
+    }
     db.prepare(`
       INSERT INTO viajes_consumidos (alumno_id, ruta_id, operador_usuario_id, resultado) VALUES (?, ?, ?, ?)
     `).run(alumno.id, rutaId, req.user.id, resultado);
@@ -103,7 +128,20 @@ router.post("/", authRequired(["camionero"]), (req, res) => {
       db.prepare(`UPDATE alumnos SET viajes_restantes = viajes_restantes - 1 WHERE id = ?`).run(alumno.id);
     }
   });
-  registrar();
+  try {
+    registrar();
+  } catch (e) {
+    if (String(e.code || "").startsWith("SQLITE_CONSTRAINT")) {
+      return res.json({
+        resultado: "pase-usado",
+        mensaje: MENSAJES["pase-usado"],
+        viaManual,
+        alumno: alumnoPayload(),
+        rutaTurno: rutaTurno ? { id: rutaTurno.id, nombre: rutaTurno.nombre, codigo: rutaTurno.codigo } : null,
+      });
+    }
+    throw e;
+  }
 
   const viajesRestantes =
     resultado === "valido" ? alumno.viajes_restantes - 1 : alumno.viajes_restantes;

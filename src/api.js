@@ -137,6 +137,34 @@ const api = {
   actualizarBug: (id, estado, token) =>
     request(`/bugs/${id}`, { method: "PATCH", body: { estado }, token }),
 
+
+  // Admin transportistas
+  filtrosTransportistas: (token) => request("/reportes/filtros-transportistas", { token }),
+  reportesTransportistas: (desde, hasta, token, extra = {}) => {
+    const q = new URLSearchParams({ desde, hasta });
+    if (extra.choferId) q.set("choferId", extra.choferId);
+    if (extra.unidadId) q.set("unidadId", extra.unidadId);
+    return request(`/reportes/transportistas?${q.toString()}`, { token });
+  },
+
+  // Reportes
+  reportesRecargas: (desde, hasta, token) =>
+    request(`/reportes/recargas?desde=${desde}&hasta=${hasta}`, { token }),
+  reportesBeneficiario: (matricula, desde, hasta, token) =>
+    request(`/reportes/beneficiario/${encodeURIComponent(matricula)}?desde=${desde}&hasta=${hasta}`, { token }),
+  reportesViajesMensual: (mes, token) =>
+    request(`/reportes/viajes-mensual?mes=${encodeURIComponent(mes)}`, { token }),
+  reportesChofer: (desde, hasta, token, detallado = false) =>
+    request(`/reportes/chofer?desde=${desde}&hasta=${hasta}${detallado ? "&detallado=1" : ""}`, { token }),
+
+  // Ventanilla: devoluciones y ficha por matrícula
+  devolucion: (datos, token) => request("/recargas/devolucion", { method: "POST", body: datos, token }),
+  alumnoPorMatricula: (matricula, token) =>
+    request(`/recargas/alumno/${encodeURIComponent(matricula)}`, { token }),
+
+  // Pase de un solo uso (alumno)
+  paseEstado: (jti, token) => request(`/alumno/pase-estado/${encodeURIComponent(jti)}`, { token }),
+
   // Contabilidad
   contabilidadResumen: (desde, hasta, token) =>
     request(`/contabilidad/resumen?desde=${desde}&hasta=${hasta}`, { token }),

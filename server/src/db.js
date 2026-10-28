@@ -174,4 +174,16 @@ db.exec(`
 agregarColumnaSiFalta("recargas", "folio", "TEXT");
 agregarColumnaSiFalta("usuarios", "es_jefe", "INTEGER NOT NULL DEFAULT 0");
 agregarColumnaSiFalta("usuarios", "correo", "TEXT");
+
+// Pases QR de un solo uso: un jti aquí registrado ya no puede volver a validarse.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS pases_usados (
+    jti TEXT PRIMARY KEY,
+    alumno_id INTEGER NOT NULL,
+    ruta_id INTEGER,
+    usado_en TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_pases_usados_alumno ON pases_usados(alumno_id);
+`);
+
 module.exports = db;

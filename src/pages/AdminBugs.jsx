@@ -4,7 +4,7 @@ import {
   ShieldCheck, LogOut, Bug, Inbox, CheckCircle2, Clock, XCircle, RefreshCw,
 } from "lucide-react";
 import { C } from "../theme";
-import { StaffHeader, A11yWidget } from "../components/GovShell";
+import { StaffLayout } from "../components/GovShell";
 import { useStaffSesion } from "../context/StaffSesionContext";
 import useIsDesktop from "../hooks/useIsDesktop";
 import api from "../api";
@@ -82,14 +82,11 @@ export default function AdminBugs() {
   }
 
   return (
-    <div className={isDesktop ? "app-shell wide" : "app-shell"} style={{ background: C.paper, minHeight: "100vh" }}>
-      <StaffHeader
+    <StaffLayout
         title="Reportes de fallas"
         variant="municipio"
         userLabel={staff?.nombre}
-        onLogout={() => { logout(); navigate("/acceso"); }}
-      />
-      <A11yWidget />
+        onLogout={() => { logout(); navigate("/acceso"); }} maxWidth={1200}>
 
       <div style={{ padding: isDesktop ? 20 : 16 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
@@ -156,7 +153,7 @@ export default function AdminBugs() {
           )
         )}
       </div>
-    </div>
+    </StaffLayout>
   );
 }
 

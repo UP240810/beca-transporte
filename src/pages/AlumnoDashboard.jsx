@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import QRCode from "qrcode";
 import {
   User, Bus, Download, TrendingDown, CalendarCheck, ArrowLeft,
-  AlertTriangle, Wallet, History, ArrowDownCircle, ArrowUpCircle, Ban,
+  AlertTriangle, Wallet, History, ArrowDownCircle, ArrowUpCircle, Ban, CheckCircle2,
 } from "lucide-react";
 import { C } from "../theme";
-import { StaffHeader, A11yWidget } from "../components/GovShell";
+import { StaffLayout } from "../components/GovShell";
 import { useSesion } from "../context/SesionContext";
 import { formatFechaHora } from "../utils";
 import api from "../api";
@@ -126,6 +126,9 @@ export default function AlumnoDashboard() {
   const navigate = useNavigate();
   const { alumno, token, logout, cargando, refrescar } = useSesion();
   const [qrImg, setQrImg] = useState(null);
+  const [pase, setPase] = useState(null); // { jti, expiraEn }
+  const [paseUsado, setPaseUsado] = useState(false);
+  const [paseError, setPaseError] = useState("");
   const [movimientos, setMovimientos] = useState([]);
   const [cargandoHist, setCargandoHist] = useState(false);
 
@@ -133,15 +136,46 @@ export default function AlumnoDashboard() {
     if (!cargando && !alumno) navigate("/alumno/login", { replace: true });
   }, [cargando, alumno, navigate]);
 
-  useEffect(() => {
+  // PASE DE UN SOLO USO: cada QR sirve una vez. Al usarse en el camión la app
+  // lo detecta y genera uno nuevo automáticamente.
+  const generarPase = useCallback(async () => {
     if (!token) return;
-    api.qrToken(token)
-      .then(({ token: qrToken }) =>
-        QRCode.toDataURL(qrToken, { margin: 1, width: 240, color: { dark: C.navy, light: "#FFFFFF" } })
-      )
-      .then(setQrImg)
-      .catch(() => {});
+    try {
+      const { token: qrToken, jti, expiraEn } = await api.qrToken(token);
+      const img = await QRCode.toDataURL(qrToken, { margin: 1, width: 360, color: { dark: C.navy, light: "#FFFFFF" } });
+      setQrImg(img);
+      setPase({ jti, expiraEn });
+      setPaseUsado(false);
+      setPaseError("");
+    } catch (e) {
+      setPaseError(e?.message || "No se pudo generar tu pase.");
+    }
   }, [token]);
+
+  useEffect(() => { generarPase(); }, [generarPase]);
+
+  // Sondeo: ¿ya se usó este pase? ¿venció?
+  useEffect(() => {
+    if (!pase || paseUsado) return undefined;
+    const id = setInterval(async () => {
+      if (Date.now() >= pase.expiraEn) { generarPase(); return; }
+      try {
+        const r = await api.paseEstado(pase.jti, token);
+        if (r.usado) {
+          setPaseUsado(true);
+          if (typeof refrescar === "function") refrescar();
+        }
+      } catch { /* sin señal: se reintenta en el siguiente ciclo */ }
+    }, 3000);
+    return () => clearInterval(id);
+  }, [pase, paseUsado, token, generarPase, refrescar]);
+
+  // Tras usarse, se muestra el aviso unos segundos y se genera el pase nuevo
+  useEffect(() => {
+    if (!paseUsado) return undefined;
+    const t = setTimeout(generarPase, 3500);
+    return () => clearTimeout(t);
+  }, [paseUsado, generarPase]);
 
   useEffect(() => {
     if (!token) return;
@@ -194,23 +228,13 @@ export default function AlumnoDashboard() {
       link.click();
     }
 
-    if (qrImg) {
-      const img = new Image();
-      img.onload = () => {
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(w - 280, 60, 220, 220);
-        ctx.drawImage(img, w - 270, 70, 200, 200);
-        finalizarYDescargar();
-      };
-      img.src = qrImg;
-    } else {
-      finalizarYDescargar();
-    }
+    // El QR no se incluye: el pase es de un solo uso y se renueva en la app.
+    finalizarYDescargar();
   }
 
   if (cargando) {
     return (
-      <div style={{ maxWidth: 430, margin: "0 auto", minHeight: 640, background: C.paper, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ width: "100%", margin: "0 auto", minHeight: "60vh", background: C.paper, display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ fontSize: 12.5, color: "#8993A1" }}>Cargando tu cuenta…</div>
       </div>
     );
@@ -223,13 +247,10 @@ export default function AlumnoDashboard() {
     : 0;
 
   return (
-    <div style={{ maxWidth: 430, margin: "0 auto", minHeight: 640, background: C.paper }}>
-      <StaffHeader
+    <StaffLayout
         title="Mi pase estudiantil"
         userLabel={alumno?.nombreCompleto || alumno?.nombre}
-        onLogout={() => { logout(); navigate("/"); }}
-      />
-      <A11yWidget />
+        onLogout={() => { logout(); navigate("/"); }} maxWidth={760}>
 
       <div style={{ padding: 18 }}>
         <div className="f-display" style={{ fontSize: 19, fontWeight: 700, color: C.navy }}>Hola, {alumno.nombre} 👋</div>
@@ -256,13 +277,33 @@ export default function AlumnoDashboard() {
             <div style={{ fontSize: 9.5, color: C.skyBlue, opacity: 0.85 }}>Ciclo escolar 2026–2027</div>
           </div>
           <div style={{ width: 0, borderLeft: `2px dashed ${C.navySoft}` }} />
-          <div style={{ width: 130, padding: 12, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.12)" }}>
-            {qrImg ? (
-              <img src={qrImg} alt="QR de pase" style={{ width: 100, height: 100, borderRadius: 8, background: "#fff" }} />
+          <div style={{ width: "clamp(140px, 30vw, 220px)", flexShrink: 0, padding: 12, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.12)" }}>
+            <div style={{ position: "relative", width: "100%", aspectRatio: "1 / 1" }}>
+              {qrImg && !paseError ? (
+                <img src={qrImg} alt="QR del pase de un solo uso" style={{ width: "100%", height: "100%", borderRadius: 8, background: "#fff", opacity: paseUsado ? 0.12 : 1, transition: "opacity .25s" }} />
+              ) : (
+                <div style={{ width: "100%", height: "100%", borderRadius: 8, background: "rgba(255,255,255,0.15)" }} />
+              )}
+              {paseUsado && (
+                <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#fff", textAlign: "center", padding: 6 }}>
+                  <CheckCircle2 size={34} color={C.mint} />
+                  <div style={{ fontSize: 12, fontWeight: 700, marginTop: 4 }}>Pase usado</div>
+                  <div style={{ fontSize: 10.5, opacity: 0.9 }}>Generando uno nuevo…</div>
+                </div>
+              )}
+            </div>
+            {paseError ? (
+              <>
+                <div style={{ fontSize: 10.5, color: "#fff", marginTop: 6, textAlign: "center" }}>{paseError}</div>
+                <button type="button" onClick={generarPase} style={{ marginTop: 6, background: C.gold, color: C.navy, border: "none", borderRadius: 999, padding: "5px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>
+                  Reintentar
+                </button>
+              </>
             ) : (
-              <div style={{ width: 100, height: 100, borderRadius: 8, background: "rgba(255,255,255,0.15)" }} />
+              <div style={{ fontSize: 10.5, color: C.skyBlue, marginTop: 6, textAlign: "center", lineHeight: 1.3 }}>
+                Pase de un solo uso<br />Muestra en el camión
+              </div>
             )}
-            <div style={{ fontSize: 8.5, color: C.skyBlue, marginTop: 6, textAlign: "center" }}>Muestra en el camión</div>
           </div>
         </div>
 
@@ -335,6 +376,6 @@ export default function AlumnoDashboard() {
           <Wallet size={12} /> Recargas solo en efectivo · Presidencia Municipal de Calvillo
         </div>
       </div>
-    </div>
+    </StaffLayout>
   );
 }

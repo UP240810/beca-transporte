@@ -351,89 +351,6 @@ export function A11yWidget() {
 
 export { ACCESOS };
 
-/** Layout uniforme para pantallas internas (staff y alumno) */
-export function AppPage({
-  title,
-  subtitle,
-  children,
-  onLogout,
-  userLabel,
-  variant = "municipio", // municipio | finanzas | desarrollo
-  maxWidth = 960,
-  showFooter = true,
-}) {
-  return (
-    <div style={{
-      minHeight: "100vh",
-      background: C.paper,
-      fontFamily: "var(--font-sans)",
-      color: C.ink,
-      display: "flex",
-      flexDirection: "column",
-    }}>
-      <header style={{ background: C.navy, color: "#fff", boxShadow: "0 2px 12px rgba(0,51,102,0.15)" }}>
-        <div style={{
-          maxWidth: maxWidth + 80,
-          margin: "0 auto",
-          padding: "10px 20px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 12,
-          flexWrap: "wrap",
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <BrandLogos variant={variant} height={34} />
-            <div>
-              <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: 0.2 }}>{title}</div>
-              {subtitle && <div style={{ fontSize: 11, opacity: 0.85 }}>{subtitle}</div>}
-            </div>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            {userLabel && <span style={{ fontSize: 12, opacity: 0.9 }}>{userLabel}</span>}
-            {onLogout && (
-              <button
-                type="button"
-                onClick={onLogout}
-                style={{
-                  background: C.gold,
-                  color: C.navy,
-                  border: "none",
-                  borderRadius: 8,
-                  padding: "7px 14px",
-                  fontWeight: 700,
-                  fontSize: 12,
-                  cursor: "pointer",
-                }}
-              >
-                Salir
-              </button>
-            )}
-          </div>
-        </div>
-        <div style={{ height: 4, background: `linear-gradient(90deg, ${C.gold}, ${C.busBlue}, ${C.navySoft})` }} />
-      </header>
-
-      <main style={{ flex: 1, maxWidth, width: "100%", margin: "0 auto", padding: "20px 18px 40px", boxSizing: "border-box" }}>
-        {children}
-      </main>
-
-      {showFooter && (
-        <div style={{
-          background: "#001a33",
-          color: "rgba(255,255,255,0.65)",
-          fontSize: 11,
-          padding: "10px 18px",
-          textAlign: "center",
-        }}>
-          H. Ayuntamiento de Calvillo · Sistema de Beca de Transporte
-        </div>
-      )}
-      <A11yWidget />
-    </div>
-  );
-}
-
 /** Contenedor de tarjeta estándar */
 export function Card({ children, style = {} }) {
   return (
@@ -500,30 +417,66 @@ export const inputStyle = {
   color: C.ink,
 };
 
-
-/** Encabezado uniforme para módulos internos (reemplaza headers sueltos) */
-export function StaffHeader({ title, variant = "municipio", userLabel, onLogout, extra }) {
+/** Encabezado uniforme para pantallas internas.
+ *  Mismo estilo, márgenes y comportamiento que el de la página principal (GovHeader),
+ *  pero sin el logo de la presidencia: muestra el título de la pantalla. */
+export function StaffHeader({ title, subtitle, variant = "municipio", userLabel, onLogout, extra }) {
+  const logoSecretaria = variant === "finanzas" || variant === "desarrollo";
   return (
-    <header style={{ background: "#fff", borderBottom: "none", boxShadow: "0 2px 10px rgba(0,51,102,0.1)" }}>
-      <div style={{ background: C.navy, color: "#fff", padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <BrandLogos variant={variant} height={32} />
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 700 }}>{title}</div>
-            <div style={{ fontSize: 10, opacity: 0.8 }}>H. Ayuntamiento de Calvillo</div>
+    <header style={{ position: "sticky", top: 0, zIndex: 50, background: "#fff", boxShadow: "0 2px 12px rgba(0,51,102,0.12)" }}>
+      <div className="hdr-bar compact" style={{ background: C.navy, color: "#fff", minHeight: 64 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+          {logoSecretaria && (
+            <span style={{ background: "#fff", borderRadius: 8, padding: "4px 8px", display: "flex", flexShrink: 0 }}>
+              <BrandLogos variant={variant} height="clamp(30px, 6vw, 44px)" />
+            </span>
+          )}
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: "clamp(16px, 2.4vw, 20px)", fontWeight: 700, lineHeight: 1.2, overflowWrap: "anywhere" }}>{title}</div>
+            {subtitle && <div style={{ fontSize: 13, opacity: 0.85, marginTop: 2 }}>{subtitle}</div>}
           </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
           {extra}
-          {userLabel && <span style={{ fontSize: 12, opacity: 0.95 }}>{userLabel}</span>}
+          {userLabel && <span className="hdr-user" style={{ fontSize: 14, opacity: 0.95 }}>{userLabel}</span>}
           {onLogout && (
-            <button type="button" onClick={onLogout} style={{ background: C.gold, color: C.navy, border: "none", borderRadius: 8, padding: "6px 12px", fontWeight: 700, fontSize: 12, cursor: "pointer" }}>
+            <button
+              type="button"
+              onClick={onLogout}
+              style={{ background: C.gold, color: C.navy, border: "none", borderRadius: 24, padding: "9px 18px", fontWeight: 700, fontSize: 14, cursor: "pointer", whiteSpace: "nowrap" }}
+            >
               Salir
             </button>
           )}
         </div>
       </div>
-      <div style={{ height: 4, background: `linear-gradient(90deg, ${C.gold}, ${C.busBlue})` }} />
     </header>
+  );
+}
+
+/** Pantalla interna completa: header + contenido adaptable + footer (iguales en toda la app).
+ *  maxWidth controla el ancho máximo del contenido en pantallas grandes. */
+export function StaffLayout({
+  title, subtitle, variant = "municipio", userLabel, onLogout, extra,
+  maxWidth = 1200, background, children,
+}) {
+  return (
+    <div className="page-shell" style={{ background: background || C.paper, fontFamily: "var(--font-sans)", color: C.ink }}>
+      <StaffHeader title={title} subtitle={subtitle} variant={variant} userLabel={userLabel} onLogout={onLogout} extra={extra} />
+      <main className="staff-main" style={{ "--staff-max": `${maxWidth}px` }}>
+        {children}
+      </main>
+      <GovFooter />
+      <A11yWidget />
+    </div>
+  );
+}
+
+/** Layout uniforme para pantallas internas con tarjetas (Recaudación, Transportistas) */
+export function AppPage({ title, subtitle, children, onLogout, userLabel, variant = "municipio", maxWidth = 1200 }) {
+  return (
+    <StaffLayout title={title} subtitle={subtitle} variant={variant} userLabel={userLabel} onLogout={onLogout} maxWidth={maxWidth}>
+      <div style={{ paddingTop: 20, paddingBottom: 40 }}>{children}</div>
+    </StaffLayout>
   );
 }

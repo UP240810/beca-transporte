@@ -4,7 +4,7 @@ import {
   ArrowLeft, Users, UserPlus, Shield, KeyRound, UserX, UserCheck, Loader2, Copy, Check,
 } from "lucide-react";
 import { C } from "../theme";
-import { StaffHeader, A11yWidget } from "../components/GovShell";
+import { StaffLayout } from "../components/GovShell";
 import { useStaffSesion } from "../context/StaffSesionContext";
 import api from "../api";
 import BrandLogos from "../components/BrandLogos";
@@ -106,14 +106,11 @@ export default function AdminPersonal() {
   const soyJefe = data?.soyJefe ?? staff.esJefe;
 
   return (
-    <div style={{ maxWidth: 520, margin: "0 auto", minHeight: "100vh", background: C.paper }}>
-      <StaffHeader
+    <StaffLayout
         title="Personal del sistema"
         variant="municipio"
         userLabel={staff?.nombre}
-        onLogout={() => { logout(); navigate("/acceso"); }}
-      />
-      <A11yWidget />
+        onLogout={() => { logout(); navigate("/acceso"); }} maxWidth={760}>
 
       <div style={{ padding: 16 }}>
         {error && (
@@ -202,6 +199,6 @@ export default function AdminPersonal() {
           ))}
         </div>
       </div>
-    </div>
+    </StaffLayout>
   );
 }

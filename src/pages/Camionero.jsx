@@ -7,7 +7,7 @@ import {
   Users,
 } from "lucide-react";
 import { C } from "../theme";
-import { StaffHeader, A11yWidget } from "../components/GovShell";
+import { StaffLayout } from "../components/GovShell";
 import { useStaffSesion } from "../context/StaffSesionContext";
 import api from "../api";
 // reportes chofer (sencillo / detallado)
@@ -46,6 +46,13 @@ const ESTADOS = {
     icon: XCircle,
     titulo: "PASE REVOCADO",
     msg: "QR invalidado o alumno dado de baja.",
+  },
+  "pase-usado": {
+    color: "#fff",
+    bg: "#7A1F1F",
+    icon: XCircle,
+    titulo: "PASE YA USADO",
+    msg: "Este pase ya fue utilizado. Debe mostrar el pase nuevo desde su app.",
   },
   "no-encontrado": {
     color: "#fff",
@@ -185,8 +192,7 @@ function ResumenDia({ token, onCerrar }) {
   }, [fecha, token]);
 
   return (
-    <div style={{ maxWidth: 430, margin: "0 auto", minHeight: "100vh", background: "#fff" }}>
-      <StaffHeader title="Chofer" userLabel={staff?.nombre} onLogout={salir} />
+    <StaffLayout title="Chofer" userLabel={staff?.nombre} onLogout={salir} maxWidth={760}>
       <div style={{ padding: 10, background: "#fff", borderBottom: "1px solid #eee", display: "flex", flexWrap: "wrap", gap: 8, alignItems: "end" }}>
         <strong style={{ width: "100%", fontSize: 13 }}>Reportes de viajes</strong>
         <label style={{ fontSize: 12 }}>Desde <input type="date" value={repDesde} onChange={(e) => setRepDesde(e.target.value)} /></label>
@@ -261,7 +267,7 @@ function ResumenDia({ token, onCerrar }) {
           </>
         )}
       </div>
-    </div>
+    </StaffLayout>
   );
 }
 
@@ -489,13 +495,10 @@ export default function Camionero() {
 
   if (!iniciado) {
     return (
-      <div style={{ maxWidth: 430, margin: "0 auto", minHeight: 640, background: "#fff" }}>
-        <StaffHeader
+      <StaffLayout
           title="Chofer · validación"
           userLabel={staff?.nombre}
-          onLogout={salir}
-        />
-        <A11yWidget />
+          onLogout={salir} maxWidth={760}>
 
         <div style={{ padding: "32px 24px", textAlign: "center" }}>
           <div style={{ width: 54, height: 54, borderRadius: 14, background: C.skyBlue, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
@@ -565,7 +568,7 @@ export default function Camionero() {
             {preparando ? "Preparando…" : ruta ? "Comenzar a validar pases" : "Selecciona una ruta"}
           </button>
         </div>
-      </div>
+      </StaffLayout>
     );
   }
 
@@ -576,7 +579,7 @@ export default function Camionero() {
     return (
       <div
         style={{
-          maxWidth: 430, margin: "0 auto", minHeight: "100vh",
+          width: "100%", margin: "0 auto", minHeight: "100vh",
           background: estadoInfo.bg, color: estadoInfo.color,
           display: "flex", flexDirection: "column",
         }}
@@ -638,8 +641,7 @@ export default function Camionero() {
   }
 
   return (
-    <div style={{ maxWidth: 430, margin: "0 auto", minHeight: 640, background: C.paper }}>
-      <StaffHeader title="Resultado de validación" userLabel={staff?.nombre} onLogout={salir} />
+    <StaffLayout title="Resultado de validación" userLabel={staff?.nombre} onLogout={salir} maxWidth={760}>
 
       <div style={{ padding: 18 }}>
         {error && (
@@ -690,6 +692,6 @@ export default function Camionero() {
           <ListChecks size={13} /> {contador} escaneos en este turno
         </div>
       </div>
-    </div>
+    </StaffLayout>
   );
 }

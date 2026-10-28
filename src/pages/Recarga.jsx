@@ -609,7 +609,14 @@ export default function Recarga() {
   }
 
   return (
-    <div className={isDesktop ? "app-shell wide" : "app-shell"} style={{ background: C.paper, minHeight: "100vh" }}>
+    <StaffLayout
+        title="Ventanilla de cobros"
+        variant="finanzas"
+        userLabel={staff?.nombre || staff?.usuario}
+        onLogout={salir}
+        extra={
+          <button type="button" onClick={() => navigate("/personal")} style={{ background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 12 }}>Personal</button>
+        } maxWidth={1200}>
       <style>{`
         @media print {
           body * { visibility: hidden !important; }
@@ -617,16 +624,6 @@ export default function Recarga() {
           #ticket-recarga-print { position: absolute; left: 0; top: 0; width: 100%; }
         }
       `}</style>
-      <StaffHeader
-        title="Ventanilla de cobros"
-        variant="finanzas"
-        userLabel={staff?.nombre || staff?.usuario}
-        onLogout={salir}
-        extra={
-          <button type="button" onClick={() => navigate("/personal")} style={{ background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 12 }}>Personal</button>
-        }
-      />
-      <A11yWidget />
 
       <div style={{ padding: isDesktop ? 20 : 16 }}>
         <div className="f-display" style={{ fontSize: 16, fontWeight: 700, color: C.navy, marginBottom: 3 }}>Recarga de viajes</div>
@@ -731,6 +728,6 @@ export default function Recarga() {
           </>
         )}
       </div>
-    </div>
+    </StaffLayout>
   );
 }

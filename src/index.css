@@ -367,3 +367,22 @@ a.btn-anim:hover, button.btn-anim:hover, .btn-anim:hover {
     transform: none !important;
   }
 }
+
+
+/* ---- Pantallas internas (alumno, chofer, ventanilla, admin): mismos márgenes que el header/footer ---- */
+.staff-main {
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto;
+  --staff-max: 1200px;
+  padding-inline: max(clamp(14px, 3vw, 32px), calc((100% - var(--staff-max)) / 2));
+}
+/* el contenedor interior de cada pantalla ya trae su propio padding lateral: lo anulamos */
+.staff-main > div:first-of-type { padding-inline: 0 !important; }
+.staff-main table { max-width: 100%; }
+.staff-main img, .staff-main video, .staff-main canvas { max-width: 100%; }
+.staff-main input, .staff-main select, .staff-main textarea { max-width: 100%; box-sizing: border-box; }
+@media (max-width: 560px) {
+  .hdr-user { display: none; }
+}

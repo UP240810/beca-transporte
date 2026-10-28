@@ -6,7 +6,7 @@ import {
   Plus, MapPin, History, Ban,
 } from "lucide-react";
 import { C } from "../theme";
-import { StaffHeader, A11yWidget } from "../components/GovShell";
+import { StaffLayout } from "../components/GovShell";
 import { useStaffSesion } from "../context/StaffSesionContext";
 import useIsDesktop from "../hooks/useIsDesktop";
 import api from "../api";
@@ -652,17 +652,14 @@ export default function AdminSolicitudes() {
   const solicitudActual = solicitudes.find((s) => s.folio === seleccionada?.folio) || seleccionada;
 
   return (
-    <div className={isDesktop ? "app-shell wide" : "app-shell"} style={{ background: C.paper, minHeight: "100vh" }}>
-      <StaffHeader
+    <StaffLayout
         title="Desarrollo Social · Solicitudes"
         variant="desarrollo"
         userLabel={staff?.nombre}
         onLogout={() => { logout(); navigate("/acceso"); }}
         extra={
           <button type="button" onClick={() => navigate("/personal")} style={{ background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 12 }}>Personal</button>
-        }
-      />
-      <A11yWidget />
+        } maxWidth={1200}>
 
       {isDesktop ? (
         <div className="split-layout" style={{ padding: 20 }}>
@@ -701,6 +698,6 @@ export default function AdminSolicitudes() {
           }} />
         </div>
       )}
-    </div>
+    </StaffLayout>
   );
 }

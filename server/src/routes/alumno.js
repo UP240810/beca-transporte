@@ -149,7 +149,16 @@ router.get("/qr-token", authRequired(["alumno"]), (req, res) => {
   if (alumno.activo === 0) {
     return res.status(403).json({ error: "Tu cuenta está dada de baja; no se puede emitir un pase." });
   }
-  res.json({ token: firmarPaseQR(alumno) });
+  const { token, jti, exp } = firmarPaseQR(alumno);
+  res.json({ token, jti, expiraEn: exp * 1000 });
+});
+
+// GET /api/alumno/pase-estado/:jti — la app del alumno pregunta si su pase ya fue usado
+router.get("/pase-estado/:jti", authRequired(["alumno"]), (req, res) => {
+  const alumno = db.prepare(`SELECT id FROM alumnos WHERE usuario_id = ?`).get(req.user.id);
+  if (!alumno) return res.status(404).json({ error: "No se encontró tu información de alumno." });
+  const fila = db.prepare(`SELECT usado_en FROM pases_usados WHERE jti = ? AND alumno_id = ?`).get(req.params.jti, alumno.id);
+  res.json({ usado: !!fila, usadoEn: fila?.usado_en || null });
 });
 
 module.exports = router;
