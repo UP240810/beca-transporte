@@ -4,5 +4,3 @@ data/*.db-journal
 data/*.db-wal
 data/*.db-shm
 .env
-
-public/pase_calvillo_21s.mp4
