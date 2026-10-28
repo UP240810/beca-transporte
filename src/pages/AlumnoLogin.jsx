@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { C } from "../theme";
-import api from "../api";
 import { useSesion } from "../context/SesionContext";
 import PasswordInput from "../components/PasswordInput";
 import { GovHeader, GovFooter, A11yWidget, Card, Btn, Field, inputStyle } from "../components/GovShell";
@@ -18,8 +17,7 @@ export default function AlumnoLogin() {
     e.preventDefault();
     setBusy(true); setErr("");
     try {
-      const data = await api.alumnoLogin(usuario.trim(), password);
-      login(data);
+      await login(usuario.trim(), password);
       navigate("/alumno");
     } catch (ex) {
       setErr(ex.message || "No se pudo iniciar sesión.");

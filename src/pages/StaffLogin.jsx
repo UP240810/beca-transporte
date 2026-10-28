@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { C } from "../theme";
-import api from "../api";
 import { useStaffSesion } from "../context/StaffSesionContext";
 import PasswordInput from "../components/PasswordInput";
 import { GovHeader, GovFooter, A11yWidget, Card, Btn, Field, inputStyle } from "../components/GovShell";
@@ -28,16 +27,8 @@ export default function StaffLogin({ rol = "recaudacion" }) {
     e.preventDefault();
     setBusy(true); setErr("");
     try {
-      const data = await api.staffLogin(usuario.trim(), password, rol);
-      if (data.rol !== rol && !(rol === "contabilidad" && data.rol === "recaudacion")) {
-        // allow if same family
-        if (data.rol !== rol) {
-          setErr(`Esta cuenta es de “${data.rol}”, no de ${meta.title}.`);
-          setBusy(false);
-          return;
-        }
-      }
-      login(data);
+      // El contexto llama a la API (con el rol), guarda la sesión y la activa.
+      await login(rol, usuario.trim(), password);
       navigate(meta.path);
     } catch (ex) {
       setErr(ex.message || "No se pudo iniciar sesión.");
