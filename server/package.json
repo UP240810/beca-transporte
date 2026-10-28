@@ -1,7 +1,7 @@
 {
   "name": "beca-transporte-server",
   "version": "1.0.0",
-  "description": "API Sistema Digital Beca de Transporte Estudiantil — Calvillo",
+  "description": "API Sistema Digital Beca de Transporte Estudiantil \u2014 Calvillo",
   "main": "src/index.js",
   "engines": {
     "node": "20.x"
@@ -16,7 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.3",
-    "better-sqlite3": "^11.7.0",
+    "better-sqlite3": "^13.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",

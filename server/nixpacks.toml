@@ -2,7 +2,7 @@
 NIXPACKS_NODE_VERSION = "20"
 
 [phases.install]
-cmds = ["npm ci --omit=dev || npm install --omit=dev"]
+cmds = ["npm install --omit=dev"]
 
 [start]
 cmd = "node src/seed.js && node src/index.js"
