@@ -109,6 +109,13 @@ const api = {
     request("/recargas", { method: "POST", body: datos, token }),
   recargasHoy: (token) => request("/recargas/hoy", { token }),
 
+  // Recorridos del camionero (empezar / terminar ruta, historial)
+  iniciarRecorrido: (datos, token) => request("/recorridos", { method: "POST", body: datos, token }),
+  terminarRecorrido: (clave, datos, token) =>
+    request(`/recorridos/${encodeURIComponent(clave)}/terminar`, { method: "POST", body: datos || {}, token }),
+  recorridos: (token, limit = 30) => request(`/recorridos?limit=${limit}`, { token }),
+  recorrido: (clave, token) => request(`/recorridos/${encodeURIComponent(clave)}`, { token }),
+
   // Validaciones (camionero)
   validar: (datos, token) => request("/validaciones", { method: "POST", body: datos, token }),
   validacionesHoy: (token) => request("/validaciones/hoy", { token }),

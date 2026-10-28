@@ -186,4 +186,20 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_pases_usados_alumno ON pases_usados(alumno_id);
 `);
 
+// Recorridos del camionero: un recorrido = desde "Empezar ruta" hasta "Terminar ruta".
+// `clave` la genera la app (sirve también cuando la ruta se inicia sin señal).
+db.exec(`
+  CREATE TABLE IF NOT EXISTS recorridos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    clave TEXT NOT NULL UNIQUE,
+    operador_usuario_id INTEGER NOT NULL REFERENCES usuarios(id),
+    ruta_id INTEGER NOT NULL REFERENCES rutas(id),
+    iniciado_en TEXT NOT NULL DEFAULT (datetime('now')),
+    terminado_en TEXT
+  );
+  CREATE INDEX IF NOT EXISTS idx_recorridos_operador ON recorridos(operador_usuario_id, iniciado_en);
+`);
+agregarColumnaSiFalta("viajes_consumidos", "recorrido_id", "INTEGER REFERENCES recorridos(id)");
+db.exec(`CREATE INDEX IF NOT EXISTS idx_viajes_recorrido ON viajes_consumidos(recorrido_id)`);
+
 module.exports = db;

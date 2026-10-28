@@ -396,3 +396,14 @@ a.btn-anim:hover, button.btn-anim:hover, .btn-anim:hover {
 .hdr-bar.staff {
   padding-inline: max(clamp(18px, 4vw, 44px), calc((100% - var(--staff-max, 1200px)) / 2));
 }
+
+/* ---- Barras de filtros (Recaudación, Transportistas…): todo alineado y de la misma altura ---- */
+.filter-bar > * { margin-bottom: 0; }
+.filter-bar input, .filter-bar select { min-height: 48px; }
+.filter-bar button { min-height: 48px; }
+.filter-bar .filter-grow { flex: 1 1 180px; min-width: 160px; }
+.filter-bar .filter-sep { flex: 1 1 100%; height: 0; }
+@media (max-width: 560px) {
+  .filter-bar > label, .filter-bar > button, .filter-bar > .filter-grow { flex: 1 1 100%; }
+  .filter-bar input[type="date"] { width: 100% !important; }
+}

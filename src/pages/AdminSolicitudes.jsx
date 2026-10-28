@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import {
   ShieldCheck, ChevronRight, ArrowLeft, User, Phone, Mail,
   GraduationCap, Bus, CheckCircle2, Send, KeyRound, LogOut, Users, Inbox, ShieldAlert,
-  Plus, MapPin, History, Ban,
+  Plus, MapPin, History, Ban, FileText,
 } from "lucide-react";
 import { C } from "../theme";
 import { StaffLayout } from "../components/GovShell";
@@ -12,6 +12,7 @@ import useIsDesktop from "../hooks/useIsDesktop";
 import api from "../api";
 import { formatFechaHora } from "../utils";
 import BrandLogos from "../components/BrandLogos";
+import FormularioSolicitud from "../components/FormularioSolicitud";
 
 function Badge({ estado }) {
   const map = {
@@ -230,12 +231,20 @@ function validarAsignaciones(asignaciones) {
   return null;
 }
 
+// Los tres botones comparten medidas: mismo alto, texto en una línea y se acomodan en 2 filas si no caben.
+const btnAccion = {
+  flex: "1 1 130px", minHeight: 46, padding: "0 12px", borderRadius: 10,
+  display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
+  fontSize: 13, fontWeight: 700, lineHeight: 1.2, whiteSpace: "nowrap", cursor: "pointer", boxSizing: "border-box",
+};
+
 function DetalleSolicitud({ solicitud, token, onBack, onActualizado }) {
   const [modo, setModo] = useState(null);
   const [motivo, setMotivo] = useState("");
   const [credenciales, setCredenciales] = useState(null);
   const [error, setError] = useState("");
   const [procesando, setProcesando] = useState(false);
+  const [verFormulario, setVerFormulario] = useState(false);
   const [rutasCatalogo, setRutasCatalogo] = useState([]);
   const [asignaciones, setAsignaciones] = useState([
     { modo: "existente", rutaId: "", nombreNuevo: "", codigoNuevo: "", costo: "15", descuento: "50" },
@@ -246,6 +255,7 @@ function DetalleSolicitud({ solicitud, token, onBack, onActualizado }) {
     setMotivo("");
     setCredenciales(null);
     setError("");
+    setVerFormulario(false);
     // Prefill: un slot por trayecto pedido
     const n = Math.max(1, Math.min(3, (solicitud?.trayectos || []).length || 1));
     setAsignaciones(
@@ -323,6 +333,7 @@ function DetalleSolicitud({ solicitud, token, onBack, onActualizado }) {
 
   return (
     <div style={{ padding: 16 }}>
+      {verFormulario && <FormularioSolicitud solicitud={solicitud} token={token} onCerrar={() => setVerFormulario(false)} />}
       {onBack && (
         <button onClick={onBack} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", color: C.navy, fontSize: 12.5, fontWeight: 600, cursor: "pointer", padding: 0, marginBottom: 14 }}>
           <ArrowLeft size={15} /> Volver a solicitudes
@@ -409,26 +420,17 @@ function DetalleSolicitud({ solicitud, token, onBack, onActualizado }) {
             </div>
           )}
 
-          {solicitud.estudioSocioeconomico && (
-            <div style={{ background: C.paper, border: `1px solid ${C.paperDim}`, borderRadius: 12, padding: 12, marginBottom: 14, fontSize: 11.5 }}>
-              <div style={{ fontWeight: 700, color: C.navy, marginBottom: 8 }}>Estudio socioeconómico</div>
-              <div style={{ color: "#5B6675", marginBottom: 4 }}>
-                Vivienda: {solicitud.estudioSocioeconomico.vivienda?.tipo || "—"}
-                {solicitud.estudioSocioeconomico.vivienda?.techoLamina ? ` · Techo lámina: ${solicitud.estudioSocioeconomico.vivienda.techoLamina}` : ""}
-              </div>
-              <div style={{ color: "#5B6675", marginBottom: 4 }}>
-                Ingresos: ${solicitud.estudioSocioeconomico.ingresos?.total ?? "—"} · Egresos: ${solicitud.estudioSocioeconomico.egresos?.total ?? "—"}
-              </div>
-              <div style={{ color: "#5B6675" }}>
-                Familiares registrados: {(solicitud.estudioSocioeconomico.familiares || []).length}
-              </div>
-              {(solicitud.estudioSocioeconomico.familiares || []).slice(0, 5).map((f, i) => (
-                <div key={i} style={{ marginTop: 4, paddingTop: 4, borderTop: `1px solid ${C.paperDim}`, color: C.ink }}>
-                  {f.nombre || "Sin nombre"} · parentesco {f.parentesco || "—"} · occ. {f.ocupacion || "—"}
-                </div>
-              ))}
-            </div>
-          )}
+          <button
+            type="button"
+            onClick={() => setVerFormulario(true)}
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%",
+              minHeight: 46, padding: "0 14px", borderRadius: 10, marginBottom: 14, cursor: "pointer",
+              border: `1.5px solid ${C.navy}`, background: `${C.navy}0A`, color: C.navy, fontWeight: 700, fontSize: 13.5,
+            }}
+          >
+            <FileText size={16} /> Ver formulario completo
+          </button>
 
           {Array.isArray(solicitud.documentos) && solicitud.documentos.length > 0 && (
             <div style={{ background: C.paper, border: `1px solid ${C.paperDim}`, borderRadius: 12, padding: 12, marginBottom: 14 }}>
@@ -556,15 +558,15 @@ function DetalleSolicitud({ solicitud, token, onBack, onActualizado }) {
               </div>
             </div>
           ) : (
-            <div style={{ display: "flex", gap: 8 }}>
-              <button type="button" onClick={() => setModo("rechazar")} disabled={procesando} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px 0", borderRadius: 10, border: `1px solid ${C.paperDim}`, background: "#fff", color: C.garnet, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-                <Ban size={14} /> Rechazar
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              <button type="button" onClick={() => setModo("rechazar")} disabled={procesando} style={{ ...btnAccion, border: `1px solid ${C.paperDim}`, background: "#fff", color: C.garnet }}>
+                <Ban size={15} style={{ flexShrink: 0 }} /> Rechazar
               </button>
-              <button type="button" onClick={() => setModo("corregir")} disabled={procesando} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px 0", borderRadius: 10, border: `1px solid ${C.garnet}`, background: "#fff", color: C.garnet, fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
-                <Send size={14} /> Pedir corrección
+              <button type="button" onClick={() => setModo("corregir")} disabled={procesando} style={{ ...btnAccion, border: `1px solid ${C.garnet}`, background: "#fff", color: C.garnet }}>
+                <Send size={15} style={{ flexShrink: 0 }} /> Pedir corrección
               </button>
-              <button onClick={() => setModo("aprobar")} disabled={procesando} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "11px 0", borderRadius: 10, border: "none", background: C.busBlue, color: "#fff", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}>
-                <CheckCircle2 size={14} /> Aprobar
+              <button type="button" onClick={() => setModo("aprobar")} disabled={procesando} style={{ ...btnAccion, border: "none", background: C.busBlue, color: "#fff" }}>
+                <CheckCircle2 size={15} style={{ flexShrink: 0 }} /> Aprobar
               </button>
             </div>
           )}
@@ -648,12 +650,21 @@ export default function AdminSolicitudes() {
     navigate("/acceso");
   }
 
-  const conteos = { [filtro]: solicitudes.length };
+  const [conteos, setConteos] = useState({});
+  useEffect(() => {
+    let cancel = false;
+    ["pendiente", "corregir", "aprobada", "rechazada"].forEach((estado) => {
+      api.solicitudes(estado, staff.token)
+        .then((lista) => { if (!cancel) setConteos((c) => ({ ...c, [estado]: lista.length })); })
+        .catch(() => {});
+    });
+    return () => { cancel = true; };
+  }, [staff.token, solicitudes]);
   const solicitudActual = solicitudes.find((s) => s.folio === seleccionada?.folio) || seleccionada;
 
   return (
     <StaffLayout
-        title="Desarrollo Social · Solicitudes"
+        title="Solicitudes"
         variant="desarrollo"
         userLabel={staff?.nombre}
         onLogout={() => { logout(); navigate("/acceso"); }}

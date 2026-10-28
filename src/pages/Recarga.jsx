@@ -12,6 +12,7 @@ import useIsDesktop from "../hooks/useIsDesktop";
 import api from "../api";
 import { formatFechaHora } from "../utils";
 import BrandLogos from "../components/BrandLogos";
+import { StaffLayout } from "../components/GovShell";
 
 const READER_ID = "qr-reader-ventanilla";
 

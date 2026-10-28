@@ -14,6 +14,7 @@ const validacionesRoutes = require("./routes/validaciones");
 const bugsRoutes = require("./routes/bugs");
 const personalRoutes = require("./routes/personal");
 const contabilidadRoutes = require("./routes/contabilidad");
+const { router: recorridosRoutes } = require("./routes/recorridos");
 
 const app = express();
 
@@ -79,6 +80,7 @@ app.use("/api/validaciones", validacionesRoutes);
 app.use("/api/bugs", bugsRoutes);
 app.use("/api/personal", personalRoutes);
 app.use("/api/contabilidad", contabilidadRoutes);
+app.use("/api/recorridos", recorridosRoutes);
 
 app.use((err, req, res, next) => {
   if (err && String(err.message || "").includes("CORS")) {

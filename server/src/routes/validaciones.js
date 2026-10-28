@@ -2,6 +2,7 @@ const express = require("express");
 const db = require("../db");
 const { authRequired } = require("../middleware/auth");
 const { verificarPaseQR } = require("../qr");
+const { asegurarRecorrido } = require("./recorridos");
 
 const router = express.Router();
 
@@ -25,7 +26,7 @@ function rutasDelAlumno(alumnoId) {
 
 // POST /api/validaciones  { qrToken } o { matricula }, { rutaId }
 router.post("/", authRequired(["camionero"]), (req, res) => {
-  const { qrToken, matricula: matriculaDirecta, rutaId, escaneadoEn } = req.body;
+  const { qrToken, matricula: matriculaDirecta, rutaId, escaneadoEn, recorridoClave } = req.body;
   if ((!qrToken && !matriculaDirecta) || !rutaId) {
     return res.status(400).json({ error: "Faltan datos del escaneo." });
   }
@@ -125,9 +126,12 @@ router.post("/", authRequired(["camionero"]), (req, res) => {
     if (resultado === "valido" && jti) {
       db.prepare(`INSERT INTO pases_usados (jti, alumno_id, ruta_id) VALUES (?, ?, ?)`).run(jti, alumno.id, rutaId);
     }
+    const recorrido = recorridoClave
+      ? asegurarRecorrido({ clave: recorridoClave, operadorId: req.user.id, rutaId, iniciadoEn: escaneadoEn })
+      : null;
     db.prepare(`
-      INSERT INTO viajes_consumidos (alumno_id, ruta_id, operador_usuario_id, resultado) VALUES (?, ?, ?, ?)
-    `).run(alumno.id, rutaId, req.user.id, resultado);
+      INSERT INTO viajes_consumidos (alumno_id, ruta_id, operador_usuario_id, resultado, recorrido_id) VALUES (?, ?, ?, ?, ?)
+    `).run(alumno.id, rutaId, req.user.id, resultado, recorrido ? recorrido.id : null);
 
     if (resultado === "valido") {
       db.prepare(`UPDATE alumnos SET viajes_restantes = viajes_restantes - 1 WHERE id = ?`).run(alumno.id);

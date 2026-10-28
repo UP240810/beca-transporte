@@ -367,13 +367,14 @@ export function Card({ children, style = {} }) {
   );
 }
 
-export function Btn({ children, onClick, variant = "primary", type = "button", disabled, style = {} }) {
+export function Btn({ children, onClick, variant = "primary", type = "button", disabled, style = {}, icon: Icon }) {
   const styles = {
     primary: { background: C.navy, color: "#fff" },
     accent: { background: C.busBlue, color: "#fff" },
     gold: { background: C.gold, color: C.navy },
     ghost: { background: "#fff", color: C.navy, border: `1px solid ${C.paperDim}` },
     danger: { background: C.garnet, color: "#fff" },
+    excel: { background: "#1D6F42", color: "#fff" },
   };
   return (
     <button
@@ -383,31 +384,51 @@ export function Btn({ children, onClick, variant = "primary", type = "button", d
       style={{
         border: "none",
         borderRadius: 9,
-        padding: "13px 20px",
+        padding: "0 20px",
+        minHeight: 48,
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 8,
+        whiteSpace: "nowrap",
         fontWeight: 700,
         fontSize: 16,
+        lineHeight: 1.2,
+        boxSizing: "border-box",
         cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.6 : 1,
         ...styles[variant],
         ...style,
       }}
     >
+      {Icon && <Icon size={18} />}
       {children}
     </button>
   );
 }
 
-export function Field({ label, children }) {
+/** flush: sin margen inferior (para usarlo dentro de una FilterBar y que todo quede alineado) */
+export function Field({ label, children, flush = false, style = {} }) {
   return (
-    <label style={{ display: "block", fontSize: 15, color: "#5b6675", marginBottom: 12 }}>
+    <label style={{ display: "block", fontSize: 15, color: "#5b6675", marginBottom: flush ? 0 : 12, ...style }}>
       <span style={{ display: "block", marginBottom: 4, fontWeight: 600 }}>{label}</span>
       {children}
     </label>
   );
 }
 
+/** Barra de filtros/botones: todo alineado al fondo y con la misma altura que los inputs. */
+export function FilterBar({ children, style = {} }) {
+  return (
+    <div className="filter-bar" style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "flex-end", ...style }}>
+      {children}
+    </div>
+  );
+}
+
 export const inputStyle = {
   width: "100%",
+  minHeight: 48,
   padding: "12px 14px",
   borderRadius: 10,
   border: `1px solid ${C.paperDim}`,
@@ -425,11 +446,9 @@ export function StaffHeader({ title, subtitle, variant = "municipio", userLabel,
   return (
     <header style={{ position: "sticky", top: 0, zIndex: 50, background: "#fff", boxShadow: "0 2px 12px rgba(0,51,102,0.12)", "--staff-max": `${maxWidth}px` }}>
       <div className="hdr-bar compact staff" style={{ background: C.navy, color: "#fff", minHeight: 64 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "clamp(10px, 2vw, 20px)", minWidth: 0 }}>
           {logoSecretaria && (
-            <span style={{ background: "#fff", borderRadius: 8, padding: "4px 8px", display: "flex", flexShrink: 0 }}>
-              <BrandLogos variant={variant} height="clamp(30px, 6vw, 44px)" />
-            </span>
+            <BrandLogos variant={variant} onDark height="clamp(84px, 16vw, 132px)" style={{ flexShrink: 0 }} />
           )}
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: "clamp(16px, 2.4vw, 20px)", fontWeight: 700, lineHeight: 1.2, overflowWrap: "anywhere" }}>{title}</div>

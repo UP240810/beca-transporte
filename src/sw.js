@@ -67,6 +67,7 @@ async function syncPendientes() {
       if (item.qrToken) body.qrToken = item.qrToken;
       if (item.matricula) body.matricula = item.matricula;
       if (item.ts) body.escaneadoEn = item.ts;
+      if (item.recorridoClave) body.recorridoClave = item.recorridoClave;
 
       const res = await fetch(`${meta.apiBase}/validaciones`, {
         method: "POST",
