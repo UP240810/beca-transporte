@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { C } from "../theme";
 import guayaba from "../assets/guayaba.png";
 
-/** Pantalla de carga: fondo azul degradado + guayaba en blanco. */
+/** Pantalla de carga: fondo blanco, guayaba azul (sin deformarse) y barra que va y viene. */
 export default function PageLoader() {
   const [show, setShow] = useState(true);
   const [fade, setFade] = useState(false);
@@ -31,7 +31,7 @@ export default function PageLoader() {
         position: "fixed",
         inset: 0,
         zIndex: 100000,
-        background: `linear-gradient(160deg, ${C.navy} 0%, ${C.navySoft} 45%, #0a4d8c 100%)`,
+        background: "#fff",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -41,48 +41,43 @@ export default function PageLoader() {
         pointerEvents: fade ? "none" : "auto",
       }}
     >
+      {/* La guayaba conserva su proporción original (417 × 550) y se tiñe de azul con una máscara */}
       <div
         aria-hidden
-        style={{
-          position: "absolute",
-          width: 180,
-          height: 180,
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%)",
-        }}
-      />
-      <img
-        src={guayaba}
-        alt=""
         className="loader-guayaba"
-        width={104}
-        height={104}
         style={{
-          marginBottom: 20,
-          display: "block",
-          position: "relative",
-          filter: "brightness(0) invert(1)",
+          height: 120,
+          aspectRatio: "417 / 550",
+          marginBottom: 22,
+          background: C.navy,
+          WebkitMaskImage: `url(${guayaba})`,
+          maskImage: `url(${guayaba})`,
+          WebkitMaskRepeat: "no-repeat",
+          maskRepeat: "no-repeat",
+          WebkitMaskPosition: "center",
+          maskPosition: "center",
+          WebkitMaskSize: "contain",
+          maskSize: "contain",
         }}
       />
       <div
         style={{
           fontWeight: 600,
-          color: "rgba(255,255,255,0.95)",
+          color: C.navy,
           fontSize: 16,
           marginBottom: 16,
           letterSpacing: "0.02em",
           fontFamily: "var(--font-sans, Inter, system-ui, sans-serif)",
-          position: "relative",
         }}
       >
         Cargando…
       </div>
       <div
         style={{
-          width: 140,
-          height: 3,
+          width: 160,
+          height: 4,
           borderRadius: 999,
-          background: "rgba(255,255,255,0.2)",
+          background: `${C.navy}1F`,
           overflow: "hidden",
           position: "relative",
         }}
@@ -90,24 +85,29 @@ export default function PageLoader() {
         <div
           className="loader-bar"
           style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
             height: "100%",
-            width: "42%",
-            background: "rgba(255,255,255,0.95)",
+            width: "40%",
+            background: C.navy,
             borderRadius: 999,
           }}
         />
       </div>
       <style>{`
         @keyframes loader-guayaba {
-          0%, 100% { transform: scale(0.88); }
-          50% { transform: scale(1.12); }
+          0%, 100% { transform: translateY(0) scale(0.96); }
+          50% { transform: translateY(-4px) scale(1.04); }
         }
+        /* Avanti e indietro: la barra va hasta el extremo y regresa */
         @keyframes loader-bar {
-          0% { transform: translateX(-120%); }
-          100% { transform: translateX(280%); }
+          0%   { transform: translateX(0); }
+          50%  { transform: translateX(150%); }
+          100% { transform: translateX(0); }
         }
-        .loader-guayaba { animation: loader-guayaba 1.15s ease-in-out infinite; }
-        .loader-bar { animation: loader-bar 1.05s ease-in-out infinite; }
+        .loader-guayaba { animation: loader-guayaba 1.4s ease-in-out infinite; }
+        .loader-bar { animation: loader-bar 1.3s ease-in-out infinite; }
         @media (prefers-reduced-motion: reduce) {
           .loader-guayaba, .loader-bar { animation: none; }
         }

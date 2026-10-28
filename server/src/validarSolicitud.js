@@ -81,6 +81,9 @@ function validarSolicitudBody(body) {
     });
   }
 
+  if (!fotoBase64 || !String(fotoBase64).startsWith("data:image/")) {
+    errores.push("La foto del estudiante es obligatoria.");
+  }
   if (fotoBase64 && String(fotoBase64).length > 2_000_000) {
     errores.push("La foto es demasiado pesada.");
   }

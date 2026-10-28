@@ -263,6 +263,7 @@ export default function Solicitud() {
       if (!form.carrera.trim()) { errs.carrera = true; msgs.push("Carrera obligatoria"); }
       if (!form.grado) { errs.grado = true; msgs.push("Selecciona grado"); }
       if (!form.matricula.trim()) { errs.matricula = true; msgs.push("Matrícula obligatoria"); }
+      if (!foto) { errs.foto = true; msgs.push("Foto del estudiante obligatoria"); }
     }
     if (p === 1) {
       for (let i = 0; i < numRutas; i++) {
@@ -380,7 +381,7 @@ export default function Solicitud() {
         ...form,
         coloniaLocalidad: form.coloniaLocalidad,
         trayectos: trayectosStr,
-        fotoBase64: foto || undefined,
+        fotoBase64: foto,
         estudioSocioeconomico,
         documentos,
       });
@@ -469,8 +470,8 @@ export default function Solicitud() {
               <Select value={form.grado} onChange={(e) => setF("grado", e.target.value)} options={GRADOS} placeholder="Grado" />
             </Field>
           </div>
-          <Field label="Matrícula escolar"><input required value={form.matricula} onChange={(e) => setF("matricula", e.target.value)} style={inputStyle()} className="f-mono" /></Field>
-          <Field label="Foto del estudiante (opcional)" icon={Camera}>
+          <Field label="Matrícula o número de control"><input required value={form.matricula} onChange={(e) => setF("matricula", e.target.value)} style={inputStyle()} className="f-mono" /></Field>
+          <Field label="Foto del estudiante (obligatoria)" icon={Camera}>
             {foto ? (
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <img src={foto} alt="" style={{ width: 56, height: 56, borderRadius: 8, objectFit: "cover" }} />

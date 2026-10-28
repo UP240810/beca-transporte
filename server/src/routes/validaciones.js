@@ -43,7 +43,12 @@ router.post("/", authRequired(["camionero"]), (req, res) => {
       matricula = payload.matricula;
       versionEnToken = payload.v != null ? Number(payload.v) : 1;
       viaManual = false;
-    } catch {
+    } catch (e) {
+      if (e.codigo === "CREDENCIAL") {
+        return res.status(400).json({
+          error: "Este es el QR de la credencial (identificación). Para viajar, el estudiante debe mostrar su pase de un solo uso desde la app.",
+        });
+      }
       return res.status(400).json({ error: "QR inválido, vencido o no reconocido." });
     }
   }

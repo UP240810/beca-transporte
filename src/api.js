@@ -94,7 +94,9 @@ const api = {
   alumnoMe: (token) => request("/alumno/me", { token }),
   alumnoHistorial: (token, limit = 50) =>
     request(`/alumno/historial?limit=${limit}`, { token }),
-  qrToken: (token) => request("/alumno/qr-token", { token }),
+  // descargable=true: pase de un solo uso para guardar como PNG (solo se emite con saldo)
+  qrToken: (token, descargable = false) => request(`/alumno/qr-token${descargable ? "?descargable=1" : ""}`, { token }),
+  credencialQr: (token) => request("/alumno/credencial-qr", { token }),
 
   // Recargas (ventanilla)
   buscarAlumnos: (q, token) => request(`/recargas/buscar?q=${encodeURIComponent(q)}`, { token }),

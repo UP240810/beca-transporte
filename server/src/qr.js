@@ -14,13 +14,13 @@ const QR_SECRET = QR_SECRET_CFG || process.env.QR_SECRET || `${JWT_SECRET}::qr-p
 // Con qr_version, Recaudación sigue pudiendo revocar todos los pases de un alumno.
 const VIGENCIA = process.env.PASE_VIGENCIA || "12h";
 
-function firmarPaseQR(alumno) {
+function firmarPaseQR(alumno, opts = {}) {
   const version = alumno.qr_version != null ? Number(alumno.qr_version) : 1;
   const jti = crypto.randomUUID();
   const token = jwt.sign(
     { matricula: alumno.matricula, tipo: "pase-transporte", v: version },
     QR_SECRET,
-    { expiresIn: VIGENCIA, jwtid: jti }
+    { expiresIn: opts.vigencia || VIGENCIA, jwtid: jti }
   );
   const { exp } = jwt.decode(token);
   return { token, jti, exp };
@@ -34,6 +34,11 @@ function firmarPaseQR(alumno) {
 function verificarPaseQR(token, opts = {}) {
   const fueraDeLinea = !!opts.escaneadoEn;
   const payload = jwt.verify(token, QR_SECRET, { ignoreExpiration: fueraDeLinea });
+  if (payload.tipo === "credencial") {
+    const err = new Error("Este QR es el de la credencial física (identificación), no un pase de viaje.");
+    err.codigo = "CREDENCIAL";
+    throw err;
+  }
   if (payload.tipo !== "pase-transporte") {
     throw new Error("El código no corresponde a un pase de transporte.");
   }
@@ -46,4 +51,20 @@ function verificarPaseQR(token, opts = {}) {
   return payload;
 }
 
-module.exports = { firmarPaseQR, verificarPaseQR };
+// QR de la credencial física impresa: identifica al estudiante (ventanilla, recargas).
+// NO sirve para viajar: para eso se necesita el pase de un solo uso.
+function firmarCredencialQR(alumno) {
+  const version = alumno.qr_version != null ? Number(alumno.qr_version) : 1;
+  return jwt.sign({ matricula: alumno.matricula, tipo: "credencial", v: version }, QR_SECRET, { expiresIn: "1825d" });
+}
+
+/** Acepta el QR de la credencial o un pase vigente: solo para identificar al alumno. */
+function verificarQRIdentidad(token) {
+  const payload = jwt.verify(token, QR_SECRET);
+  if (payload.tipo !== "credencial" && payload.tipo !== "pase-transporte") {
+    throw new Error("Código no reconocido.");
+  }
+  return payload;
+}
+
+module.exports = { firmarPaseQR, verificarPaseQR, firmarCredencialQR, verificarQRIdentidad };

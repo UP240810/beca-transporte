@@ -3,13 +3,14 @@ import { useNavigate } from "react-router-dom";
 import QRCode from "qrcode";
 import {
   User, Bus, Download, TrendingDown, CalendarCheck, ArrowLeft,
-  AlertTriangle, Wallet, History, ArrowDownCircle, ArrowUpCircle, Ban, CheckCircle2,
+  AlertTriangle, Wallet, History, ArrowDownCircle, ArrowUpCircle, Ban, CheckCircle2, FileText,
 } from "lucide-react";
 import { C } from "../theme";
 import { StaffLayout } from "../components/GovShell";
 import { useSesion } from "../context/SesionContext";
 import { formatFechaHora } from "../utils";
 import api from "../api";
+import { descargarCredencialPDF, descargarPasePNG } from "../credencial";
 import BrandLogos from "../components/BrandLogos";
 
 function AvisoSaldo({ alumno }) {
@@ -122,6 +123,16 @@ function HistorialMovimientos({ movimientos, cargando }) {
   );
 }
 
+const formatoPesos = (n) =>
+  `$${(Number(n) || 0).toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+const estiloBotonDescarga = (deshabilitado) => ({
+  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+  padding: "12px 10px", borderRadius: 10, border: `1px solid ${C.paperDim}`,
+  background: "#fff", color: C.navy, fontSize: 12.5, fontWeight: 700,
+  cursor: deshabilitado ? "not-allowed" : "pointer", opacity: deshabilitado ? 0.55 : 1,
+});
+
 export default function AlumnoDashboard() {
   const navigate = useNavigate();
   const { alumno, token, logout, cargando, refrescar } = useSesion();
@@ -129,6 +140,8 @@ export default function AlumnoDashboard() {
   const [pase, setPase] = useState(null); // { jti, expiraEn }
   const [paseUsado, setPaseUsado] = useState(false);
   const [paseError, setPaseError] = useState("");
+  const [generando, setGenerando] = useState(""); // "pdf" | "png" | ""
+  const [errorDescarga, setErrorDescarga] = useState("");
   const [movimientos, setMovimientos] = useState([]);
   const [cargandoHist, setCargandoHist] = useState(false);
 
@@ -191,45 +204,34 @@ export default function AlumnoDashboard() {
     if (token && typeof refrescar === "function") refrescar();
   }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  function descargarTarjeta() {
-    const w = 640, h = 380;
-    const canvas = document.createElement("canvas");
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext("2d");
-
-    const grad = ctx.createLinearGradient(0, 0, w, h);
-    grad.addColorStop(0, C.navy);
-    grad.addColorStop(1, C.navySoft);
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, w, h);
-
-    ctx.fillStyle = C.gold;
-    ctx.font = "bold 15px sans-serif";
-    ctx.fillText("PASE ESTUDIANTIL", 32, 44);
-
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 26px sans-serif";
-    ctx.fillText(alumno.nombreCompleto, 32, 90);
-
-    ctx.fillStyle = C.skyBlue;
-    ctx.font = "16px monospace";
-    ctx.fillText(alumno.matricula, 32, 118);
-    ctx.fillText(alumno.escuela, 32, 145);
-
-    ctx.font = "13px sans-serif";
-    ctx.fillText("Ciclo escolar 2026–2027", 32, 300);
-    ctx.fillText("Gobierno Municipal de Calvillo", 32, 322);
-
-    function finalizarYDescargar() {
-      const link = document.createElement("a");
-      link.download = `tarjeta-${alumno.matricula}.png`;
-      link.href = canvas.toDataURL("image/png");
-      link.click();
+  // Credencial física en PDF (carta, con frente y reverso listos para recortar y enmicar)
+  async function bajarCredencial() {
+    setGenerando("pdf");
+    setErrorDescarga("");
+    try {
+      const { token: credToken } = await api.credencialQr(token);
+      const qrDataUrl = await QRCode.toDataURL(credToken, { margin: 1, width: 420, errorCorrectionLevel: "M" });
+      await descargarCredencialPDF({ alumno, qrDataUrl });
+    } catch (e) {
+      setErrorDescarga(e?.message || "No se pudo generar la credencial.");
+    } finally {
+      setGenerando("");
     }
+  }
 
-    // El QR no se incluye: el pase es de un solo uso y se renueva en la app.
-    finalizarYDescargar();
+  // Pase de un solo uso en PNG, para cuando la página no cargue (solo con saldo)
+  async function bajarPase() {
+    setGenerando("png");
+    setErrorDescarga("");
+    try {
+      const { token: t, jti, expiraEn } = await api.qrToken(token, true);
+      const qrDataUrl = await QRCode.toDataURL(t, { margin: 1, width: 720, errorCorrectionLevel: "M" });
+      await descargarPasePNG({ alumno, qrDataUrl, expiraEn, jti });
+    } catch (e) {
+      setErrorDescarga(e?.message || "No se pudo generar el pase.");
+    } finally {
+      setGenerando("");
+    }
   }
 
   if (cargando) {
@@ -252,7 +254,7 @@ export default function AlumnoDashboard() {
         userLabel={alumno?.nombreCompleto || alumno?.nombre}
         onLogout={() => { logout(); navigate("/"); }} maxWidth={760}>
 
-      <div style={{ padding: 18 }}>
+      <div className="alumno-ui" style={{ padding: 18 }}>
         <div className="f-display" style={{ fontSize: 19, fontWeight: 700, color: C.navy }}>Hola, {alumno.nombre} 👋</div>
         <div style={{ fontSize: 12, color: "#6b7785", marginTop: 2, marginBottom: 14 }}>{alumno.escuela}</div>
 
@@ -262,17 +264,19 @@ export default function AlumnoDashboard() {
         <div style={{ background: `linear-gradient(160deg, ${C.navy}, ${C.navySoft})`, borderRadius: 16, display: "flex", overflow: "hidden", boxShadow: "0 12px 28px rgba(0,51,102,0.25)" }}>
           <div style={{ flex: 1, padding: "16px 14px", color: "#fff" }}>
             <div style={{ fontSize: 9.5, letterSpacing: 1, color: C.gold, fontWeight: 700, marginBottom: 8 }}>PASE ESTUDIANTIL</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 10, background: C.skyBlue, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
-                {alumno.foto ? <img src={alumno.foto} alt={alumno.nombre} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <User size={20} color={C.navy} />}
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+              <div style={{ width: 66, height: 88, borderRadius: 10, background: C.skyBlue, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden", border: "2px solid #fff" }}>
+                {alumno.foto ? <img src={alumno.foto} alt={alumno.nombre} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <User size={30} color={C.navy} />}
               </div>
-              <div>
-                <div className="f-display" style={{ fontSize: 13.5, fontWeight: 700, lineHeight: 1.2 }}>{alumno.nombreCompleto}</div>
-                <div className="f-mono" style={{ fontSize: 10, color: C.skyBlue, marginTop: 2 }}>{alumno.matricula}</div>
+              <div style={{ minWidth: 0 }}>
+                <div className="f-display" style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.2 }}>{alumno.nombreCompleto}</div>
+                <div style={{ fontSize: 9.5, color: C.gold, fontWeight: 700, letterSpacing: 0.6, marginTop: 6 }}>NÚMERO DE CONTROL</div>
+                <div className="f-mono" style={{ fontSize: 12, color: C.skyBlue, marginTop: 1 }}>{alumno.matricula}</div>
               </div>
             </div>
-            <div style={{ fontSize: 11, color: C.skyBlue, marginBottom: 4 }}>
-              Saldo: <strong className="f-mono" style={{ color: "#fff", fontSize: 14 }}>{alumno.viajesRestantes}</strong> viajes
+            <div style={{ fontSize: 11.5, color: C.skyBlue, marginBottom: 4 }}>
+              Saldo: <strong className="f-mono" style={{ color: "#fff", fontSize: 15 }}>{alumno.viajesRestantes}</strong> {alumno.viajesRestantes === 1 ? "viaje" : "viajes"}
+              {" · "}<strong className="f-mono" style={{ color: "#fff", fontSize: 15 }}>{formatoPesos(alumno.saldoPesos)}</strong>
             </div>
             <div style={{ fontSize: 9.5, color: C.skyBlue, opacity: 0.85 }}>Ciclo escolar 2026–2027</div>
           </div>
@@ -299,25 +303,22 @@ export default function AlumnoDashboard() {
                   Reintentar
                 </button>
               </>
-            ) : (
-              <div style={{ fontSize: 10.5, color: C.skyBlue, marginTop: 6, textAlign: "center", lineHeight: 1.3 }}>
-                Pase de un solo uso<br />Muestra en el camión
-              </div>
-            )}
+            ) : null}
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={descargarTarjeta}
-          style={{
-            width: "100%", marginTop: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
-            padding: "10px 0", borderRadius: 10, border: `1px solid ${C.paperDim}`, background: "#fff",
-            color: C.navy, fontSize: 12, fontWeight: 600, cursor: "pointer",
-          }}
-        >
-          <Download size={14} /> Descargar tarjeta
-        </button>
+        <div className="alumno-descargas" style={{ marginTop: 12, display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))" }}>
+          <button type="button" onClick={bajarCredencial} disabled={!!generando} style={estiloBotonDescarga(!!generando)}>
+            <FileText size={15} /> {generando === "pdf" ? "Generando PDF…" : "Descargar credencial (PDF)"}
+          </button>
+          <button type="button" onClick={bajarPase} disabled={!!generando || alumno.viajesRestantes <= 0} style={estiloBotonDescarga(!!generando || alumno.viajesRestantes <= 0)}>
+            <Download size={15} /> {generando === "png" ? "Generando pase…" : "Pase de 1 solo uso (PNG)"}
+          </button>
+        </div>
+        <div style={{ fontSize: 10.5, color: "#8993A1", marginTop: 8, lineHeight: 1.45 }}>
+          La credencial se imprime a color y se enmica (hoja carta, lista para recortar). El pase PNG es para cuando la página no cargue: funciona una sola vez y solo se genera si tienes saldo.
+        </div>
+        {errorDescarga && <div style={{ fontSize: 11.5, color: C.garnet, marginTop: 8 }}>{errorDescarga}</div>}
 
         {/* Rutas */}
         <div style={{ marginTop: 18 }}>
@@ -358,7 +359,10 @@ export default function AlumnoDashboard() {
             <div style={{ textAlign: "right" }}>
               <div style={{ fontSize: 10.5, color: "#8993A1" }}>Saldo actual</div>
               <div className="f-mono" style={{ fontSize: 20, fontWeight: 700, color: alumno.viajesRestantes <= 0 ? C.garnet : "#1F7A56" }}>
-                {alumno.viajesRestantes}
+                {alumno.viajesRestantes} <span style={{ fontSize: 11, fontWeight: 600 }}>{alumno.viajesRestantes === 1 ? "viaje" : "viajes"}</span>
+              </div>
+              <div className="f-mono" style={{ fontSize: 14, fontWeight: 700, color: alumno.viajesRestantes <= 0 ? C.garnet : C.navy, marginTop: 2 }}>
+                {formatoPesos(alumno.saldoPesos)} <span style={{ fontSize: 10, fontWeight: 600, color: "#8993A1" }}>en pesos</span>
               </div>
             </div>
           </div>

@@ -420,11 +420,11 @@ export const inputStyle = {
 /** Encabezado uniforme para pantallas internas.
  *  Mismo estilo, márgenes y comportamiento que el de la página principal (GovHeader),
  *  pero sin el logo de la presidencia: muestra el título de la pantalla. */
-export function StaffHeader({ title, subtitle, variant = "municipio", userLabel, onLogout, extra }) {
+export function StaffHeader({ title, subtitle, variant = "municipio", userLabel, onLogout, extra, maxWidth = 1200 }) {
   const logoSecretaria = variant === "finanzas" || variant === "desarrollo";
   return (
-    <header style={{ position: "sticky", top: 0, zIndex: 50, background: "#fff", boxShadow: "0 2px 12px rgba(0,51,102,0.12)" }}>
-      <div className="hdr-bar compact" style={{ background: C.navy, color: "#fff", minHeight: 64 }}>
+    <header style={{ position: "sticky", top: 0, zIndex: 50, background: "#fff", boxShadow: "0 2px 12px rgba(0,51,102,0.12)", "--staff-max": `${maxWidth}px` }}>
+      <div className="hdr-bar compact staff" style={{ background: C.navy, color: "#fff", minHeight: 64 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
           {logoSecretaria && (
             <span style={{ background: "#fff", borderRadius: 8, padding: "4px 8px", display: "flex", flexShrink: 0 }}>
@@ -462,7 +462,7 @@ export function StaffLayout({
 }) {
   return (
     <div className="page-shell" style={{ background: background || C.paper, fontFamily: "var(--font-sans)", color: C.ink }}>
-      <StaffHeader title={title} subtitle={subtitle} variant={variant} userLabel={userLabel} onLogout={onLogout} extra={extra} />
+      <StaffHeader title={title} subtitle={subtitle} variant={variant} userLabel={userLabel} onLogout={onLogout} extra={extra} maxWidth={maxWidth} />
       <main className="staff-main" style={{ "--staff-max": `${maxWidth}px` }}>
         {children}
       </main>

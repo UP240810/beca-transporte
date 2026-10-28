@@ -1,7 +1,8 @@
 const express = require("express");
 const db = require("../db");
 const { authRequired } = require("../middleware/auth");
-const { firmarPaseQR } = require("../qr");
+const { firmarPaseQR, firmarCredencialQR } = require("../qr");
+const { cobroEstudiante } = require("../porcentajes");
 
 const router = express.Router();
 
@@ -34,6 +35,8 @@ router.get("/me", authRequired(["alumno"]), (req, res) => {
     AND strftime('%Y-%m', creado_en) = strftime('%Y-%m', 'now')
   `).get(alumno.id).n;
 
+  const costoEstudiante = cobroEstudiante(rutas[0]?.costo_por_viaje || 15);
+
   res.json({
     nombre: alumno.nombre,
     nombreCompleto: `${alumno.nombre} ${alumno.apellidos}`,
@@ -46,6 +49,9 @@ router.get("/me", authRequired(["alumno"]), (req, res) => {
       costoPorViaje: r.costo_por_viaje,
     })),
     viajesRestantes: alumno.viajes_restantes,
+    // Lo que paga el estudiante por viaje (40% del boleto) y su saldo equivalente en pesos
+    costoEstudiante: costoEstudiante,
+    saldoPesos: alumno.viajes_restantes * costoEstudiante,
     viajesLimiteMes: alumno.viajes_limite_mes,
     viajesUsadosMes: usadosMes,
     ultimoUso: ultimoViaje ? ultimoViaje.creado_en : null,
@@ -149,8 +155,21 @@ router.get("/qr-token", authRequired(["alumno"]), (req, res) => {
   if (alumno.activo === 0) {
     return res.status(403).json({ error: "Tu cuenta está dada de baja; no se puede emitir un pase." });
   }
-  const { token, jti, exp } = firmarPaseQR(alumno);
+  // Pase descargable (PNG para cuando no cargue la página): solo con saldo disponible
+  const descargable = req.query.descargable === "1";
+  if (descargable && alumno.viajes_restantes <= 0) {
+    return res.status(403).json({ error: "Necesitas saldo para generar un pase descargable. Recarga en la Presidencia Municipal." });
+  }
+  const { token, jti, exp } = firmarPaseQR(alumno, descargable ? { vigencia: process.env.PASE_DESCARGABLE_VIGENCIA || "7d" } : {});
   res.json({ token, jti, expiraEn: exp * 1000 });
+});
+
+// GET /api/alumno/credencial-qr — QR de identificación para la credencial física (PDF)
+router.get("/credencial-qr", authRequired(["alumno"]), (req, res) => {
+  const alumno = db.prepare(`SELECT * FROM alumnos WHERE usuario_id = ?`).get(req.user.id);
+  if (!alumno) return res.status(404).json({ error: "No se encontró tu información de alumno." });
+  if (alumno.activo === 0) return res.status(403).json({ error: "Tu cuenta está dada de baja." });
+  res.json({ token: firmarCredencialQR(alumno) });
 });
 
 // GET /api/alumno/pase-estado/:jti — la app del alumno pregunta si su pase ya fue usado

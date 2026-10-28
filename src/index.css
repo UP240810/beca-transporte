@@ -386,3 +386,13 @@ a.btn-anim:hover, button.btn-anim:hover, .btn-anim:hover {
 @media (max-width: 560px) {
   .hdr-user { display: none; }
 }
+
+/* ---- Pantalla del alumno: texto y foto crecen según el dispositivo ---- */
+@media (min-width: 700px)  { .alumno-ui { zoom: 1.25; } }
+@media (min-width: 1000px) { .alumno-ui { zoom: 1.5; } }
+@media (min-width: 1500px) { .alumno-ui { zoom: 1.7; } }
+
+/* ---- Header interno: el texto se alinea con el contenido y respira un poco más de las orillas ---- */
+.hdr-bar.staff {
+  padding-inline: max(clamp(18px, 4vw, 44px), calc((100% - var(--staff-max, 1200px)) / 2));
+}

@@ -1,7 +1,7 @@
 const express = require("express");
 const db = require("../db");
 const { authRequired } = require("../middleware/auth");
-const { verificarPaseQR } = require("../qr");
+const { verificarQRIdentidad } = require("../qr");
 
 const router = express.Router();
 const { cobroEstudiante, PCT_ESTUDIANTE, partesBoleto } = require("../porcentajes");
@@ -85,7 +85,7 @@ router.post("/por-qr", authRequired(["ventanilla"]), (req, res) => {
   let matricula;
   let versionEnToken = null;
   try {
-    const payload = verificarPaseQR(qrToken);
+    const payload = verificarQRIdentidad(qrToken);
     matricula = payload.matricula;
     versionEnToken = payload.v != null ? Number(payload.v) : 1;
   } catch {
