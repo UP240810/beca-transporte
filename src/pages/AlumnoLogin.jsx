@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { C } from "../theme";
 import api from "../api";
 import { useSesion } from "../context/SesionContext";
+import PasswordInput from "../components/PasswordInput";
 import { GovHeader, GovFooter, A11yWidget, Card, Btn, Field, inputStyle } from "../components/GovShell";
 
 export default function AlumnoLogin() {
@@ -39,7 +40,7 @@ export default function AlumnoLogin() {
               <input style={inputStyle} value={usuario} onChange={(e) => setUsuario(e.target.value)} autoComplete="username" required />
             </Field>
             <Field label="Contraseña">
-              <input style={inputStyle} type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
+              <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} />
             </Field>
             {err && <p style={{ color: C.garnet, fontSize: 15, marginBottom: 12 }}>{err}</p>}
             <Btn type="submit" disabled={busy} style={{ width: "100%" }}>{busy ? "Entrando…" : "Entrar"}</Btn>

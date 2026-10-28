@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { C } from "../theme";
 import api from "../api";
 import { useStaffSesion } from "../context/StaffSesionContext";
+import PasswordInput from "../components/PasswordInput";
 import { GovHeader, GovFooter, A11yWidget, Card, Btn, Field, inputStyle } from "../components/GovShell";
 
 const ROL_META = {
@@ -27,7 +28,7 @@ export default function StaffLogin({ rol = "recaudacion" }) {
     e.preventDefault();
     setBusy(true); setErr("");
     try {
-      const data = await api.staffLogin(usuario.trim(), password);
+      const data = await api.staffLogin(usuario.trim(), password, rol);
       if (data.rol !== rol && !(rol === "contabilidad" && data.rol === "recaudacion")) {
         // allow if same family
         if (data.rol !== rol) {
@@ -57,7 +58,7 @@ export default function StaffLogin({ rol = "recaudacion" }) {
               <input style={inputStyle} value={usuario} onChange={(e) => setUsuario(e.target.value)} autoComplete="username" required />
             </Field>
             <Field label="Contraseña">
-              <input style={inputStyle} type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
+              <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} />
             </Field>
             {err && <p style={{ color: C.garnet, fontSize: 15, marginBottom: 12 }}>{err}</p>}
             <Btn type="submit" disabled={busy} style={{ width: "100%" }}>{busy ? "Entrando…" : "Entrar"}</Btn>
