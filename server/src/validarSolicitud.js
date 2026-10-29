@@ -53,12 +53,32 @@ function validarSolicitudBody(body) {
   if (!coloniaLocalidad || !String(coloniaLocalidad).trim()) errores.push("Colonia / localidad es obligatoria.");
   if (!escuela || !String(escuela).trim()) errores.push("Institución educativa es obligatoria.");
   if (!grado || !String(grado).trim()) errores.push("Grado es obligatorio.");
-  if (!matricula || !String(matricula).trim()) errores.push("Matrícula es obligatoria.");
+  // Número de control / matrícula: se genera en cliente; si falta, se genera aquí
+  let matriculaFinal = String(matricula || "").trim().toLowerCase().replace(/\s/g, "");
+  if (!matriculaFinal) {
+    const esc = String(escuela || "").toLowerCase();
+    let abrev = "esc";
+    if (esc.includes("primaria")) abrev = "prim";
+    else if (esc.includes("secundaria")) abrev = "sec";
+    else if (esc.includes("cbtis")) abrev = "cbtis";
+    else if (esc.includes("cbta")) abrev = "cbta";
+    else if (esc.includes("preparatoria") || esc.includes("prepa")) abrev = "prepa";
+    else if (esc.includes("tecnológica") || esc.includes("tecnologica")) abrev = "utc";
+    else if (esc.includes("bienestar") || esc.includes("benito")) abrev = "ubbj";
+    const anio = String(new Date().getFullYear()).slice(-2);
+    const suf = String(Math.floor(1000 + Math.random() * 9000));
+    matriculaFinal = `${abrev}${anio}${suf}`;
+  }
+  if (matriculaFinal.length > 40) errores.push("Número de control demasiado largo.");
 
-  const tel = soloDigitos(telefono);
-  if (tel.length !== 10) errores.push("Teléfono debe tener exactamente 10 dígitos.");
   const cel = soloDigitos(celular);
-  if (cel.length !== 10) errores.push("Celular debe tener exactamente 10 dígitos.");
+  if (cel.length !== 10) errores.push("Teléfono personal (celular) debe tener exactamente 10 dígitos.");
+  const telRaw = soloDigitos(telefono);
+  // Teléfono de casa opcional; si viene vacío se usa el celular
+  const tel = telRaw.length === 10 ? telRaw : (cel.length === 10 ? cel : telRaw);
+  if (telRaw.length > 0 && telRaw.length !== 10) {
+    errores.push("Teléfono de casa, si se indica, debe tener 10 dígitos.");
+  }
 
   const correoLimpio = String(correo || "").trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correoLimpio)) {
@@ -67,7 +87,6 @@ function validarSolicitudBody(body) {
 
   if (String(nombre || "").trim().length > 80) errores.push("Nombre demasiado largo.");
   if (String(apellidos || "").trim().length > 80) errores.push("Apellidos demasiado largos.");
-  if (String(matricula || "").trim().length > 40) errores.push("Matrícula demasiado larga.");
 
   // —— Trayectos ——
   if (!Array.isArray(trayectos) || trayectos.length < 1 || trayectos.length > 2) {
@@ -185,7 +204,7 @@ function validarSolicitudBody(body) {
     escuela: String(escuela).trim(),
     carrera: carrera ? String(carrera).trim() : "",
     grado: String(grado).trim(),
-    matricula: String(matricula).trim(),
+    matricula: matriculaFinal,
     direccion: String(direccion).trim(),
     coloniaLocalidad: String(coloniaLocalidad).trim(),
     trayectos: trayectos.map((t) => String(t).trim()),

@@ -34,6 +34,23 @@ const ESCUELAS = [
   { value: "Otra escuela de Calvillo", abrev: "esc" },
 ];
 
+function abrevDeEscuela(nombre) {
+  const e = ESCUELAS.find((x) => x.value === nombre);
+  return (e && e.abrev) || "esc";
+}
+function esUniversidad(nombre) {
+  const a = abrevDeEscuela(nombre);
+  return a === "utc" || a === "ubbj";
+}
+/** Número de control automático: abreviatura + año + 4 dígitos */
+function generarNumeroControl(escuela) {
+  const abrev = abrevDeEscuela(escuela);
+  const anio = String(new Date().getFullYear()).slice(-2);
+  const suf = String(Math.floor(1000 + Math.random() * 9000));
+  return `${abrev}${anio}${suf}`;
+}
+
+
 const PARENTESCO = [
   { value: "1", label: "1 — Padre/Madre" },
   { value: "2", label: "2 — Hijo/a" },
@@ -268,12 +285,14 @@ export default function Solicitud() {
       if (!form.apellidos.trim()) { errs.apellidos = true; msgs.push("Apellidos obligatorios"); }
       if (!form.direccion.trim()) { errs.direccion = true; msgs.push("Dirección obligatoria"); }
       if (!form.coloniaLocalidad.trim()) { errs.coloniaLocalidad = true; msgs.push("Colonia / localidad obligatoria"); }
-      if (dig(form.telefono).length !== 10) { errs.telefono = true; msgs.push("Teléfono: 10 dígitos"); }
-      if (dig(form.celular).length !== 10) { errs.celular = true; msgs.push("Celular: 10 dígitos"); }
+      if (dig(form.celular).length !== 10) { errs.celular = true; msgs.push("Teléfono personal (celular): 10 dígitos"); }
+      if (form.telefono.trim() && dig(form.telefono).length !== 10) { errs.telefono = true; msgs.push("Teléfono de casa (opcional): si lo escribes, usa 10 dígitos"); }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.correo.trim())) { errs.correo = true; msgs.push("Correo inválido"); }
       if (!form.escuela) { errs.escuela = true; msgs.push("Selecciona institución"); }
       if (!form.grado.trim()) { errs.grado = true; msgs.push("Indica el grado (ej. 3° de primaria, 2° cuatrimestre)"); }
-      if (!form.matricula.trim()) { errs.matricula = true; msgs.push("Número de estudiante obligatorio"); }
+      if (esUniversidad(form.escuela) && !form.matricula.trim()) {
+        errs.matricula = true; msgs.push("En universidad indica tu matrícula oficial");
+      }
       if (!foto) { errs.foto = true; msgs.push("Foto del estudiante obligatoria"); }
     }
     if (p === 1) {
@@ -388,8 +407,12 @@ export default function Solicitud() {
 
     setEnviando(true);
     try {
+      const matriculaFinal = (form.matricula || "").trim()
+        || generarNumeroControl(form.escuela);
       const data = await api.crearSolicitud({
         ...form,
+        matricula: matriculaFinal,
+        telefono: form.telefono.trim() || form.celular, // si no hay casa, se usa el personal
         coloniaLocalidad: form.coloniaLocalidad,
         trayectos: trayectosStr,
         fotoBase64: foto,
@@ -468,8 +491,8 @@ export default function Solicitud() {
           <Field label="Dirección" icon={MapPin}><input required value={form.direccion} onChange={(e) => setF("direccion", e.target.value)} style={inputStyle(fieldErrors.direccion)} placeholder="Calle y número" /></Field>
           <Field label="Col. / Localidad"><input required value={form.coloniaLocalidad} onChange={(e) => setF("coloniaLocalidad", e.target.value)} style={inputStyle(fieldErrors.coloniaLocalidad)} /></Field>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-            <Field label="Celular" icon={Phone}><input required value={form.celular} onChange={(e) => setF("celular", e.target.value)} style={inputStyle(fieldErrors.celular)} placeholder="10 dígitos" inputMode="numeric" /></Field>
-            <Field label="Teléfono" icon={Phone}><input required value={form.telefono} onChange={(e) => setF("telefono", e.target.value)} style={inputStyle(fieldErrors.telefono)} placeholder="10 dígitos" inputMode="numeric" /></Field>
+            <Field label="Teléfono personal (celular) *" icon={Phone}><input required value={form.celular} onChange={(e) => setF("celular", e.target.value)} style={inputStyle(fieldErrors.celular)} placeholder="10 dígitos" inputMode="numeric" maxLength={10} /></Field>
+            <Field label="Teléfono de casa (opcional)" icon={Phone}><input value={form.telefono} onChange={(e) => setF("telefono", e.target.value)} style={inputStyle(fieldErrors.telefono)} placeholder="Opcional · 10 dígitos" inputMode="numeric" maxLength={10} /></Field>
           </div>
           <Field label="Correo electrónico" icon={Mail}><input required type="email" value={form.correo} onChange={(e) => setF("correo", e.target.value)} style={inputStyle(fieldErrors.correo)} /></Field>
           <Field label="Institución educativa" icon={GraduationCap}>
@@ -483,7 +506,17 @@ export default function Solicitud() {
               <input required value={form.grado} onChange={(e) => setF("grado", e.target.value)} style={inputStyle(fieldErrors.grado)} placeholder="Ej. 2° de primaria, 1er cuatrimestre, 3° de secundaria" />
             </Field>
           </div>
-          <Field label="Número de estudiante"><input required value={form.matricula} onChange={(e) => setF("matricula", e.target.value.toLowerCase().replace(/\s/g, ""))} style={inputStyle()} className="f-mono" placeholder="Ej. cbtis2024, cbta2023, utc2025, prepa2024…" /><div style={{ fontSize: 11, color: "#8993A1", marginTop: 4 }}>Usa la abreviatura de tu escuela + año o folio (ej. <span className="f-mono">cbta2023</span>, <span className="f-mono">utc2024</span>). No uses prefijos UPA.</div></Field>
+          {esUniversidad(form.escuela) ? (
+            <Field label="Matrícula universitaria">
+              <input required value={form.matricula} onChange={(e) => setF("matricula", e.target.value.toLowerCase().replace(/\s/g, ""))} style={inputStyle(fieldErrors.matricula)} className="f-mono" placeholder="Tu matrícula oficial de la universidad" />
+              <div style={{ fontSize: 11, color: "#8993A1", marginTop: 4 }}>Solo para nivel superior. En primaria, secundaria y prepa el número de control se genera solo.</div>
+            </Field>
+          ) : (
+            <div style={{ fontSize: 12.5, color: "#5B6675", background: `${C.skyBlue}22`, borderRadius: 10, padding: "10px 12px", lineHeight: 1.45 }}>
+              <strong style={{ color: C.navy }}>Número de control</strong>
+              <div style={{ marginTop: 4 }}>Se asignará automáticamente según tu escuela (por ejemplo <span className="f-mono">prim25####</span>, <span className="f-mono">cbtis25####</span>). No necesitas escribirlo.</div>
+            </div>
+          )}
           <Field label="Foto del estudiante — tamaño infantil (obligatoria)" icon={Camera}>
             {foto ? (
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
