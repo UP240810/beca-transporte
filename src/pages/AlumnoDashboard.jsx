@@ -194,7 +194,15 @@ export default function AlumnoDashboard() {
     if (!token) return;
     setCargandoHist(true);
     api.alumnoHistorial(token, 40)
-      .then((data) => setMovimientos(data.movimientos || []))
+      .then((data) => {
+        const lista = data.movimientos || [];
+        lista.sort((a, b) => {
+          const tb = Date.parse(String(b.fecha).replace(" ", "T")) || 0;
+          const ta = Date.parse(String(a.fecha).replace(" ", "T")) || 0;
+          return tb - ta;
+        });
+        setMovimientos(lista);
+      })
       .catch(() => setMovimientos([]))
       .finally(() => setCargandoHist(false));
   }, [token]);
@@ -362,7 +370,12 @@ export default function AlumnoDashboard() {
                 {alumno.viajesRestantes} <span style={{ fontSize: 11, fontWeight: 600 }}>{alumno.viajesRestantes === 1 ? "viaje" : "viajes"}</span>
               </div>
               <div className="f-mono" style={{ fontSize: 14, fontWeight: 700, color: alumno.viajesRestantes <= 0 ? C.garnet : C.navy, marginTop: 2 }}>
-                {formatoPesos(alumno.saldoPesos)} <span style={{ fontSize: 10, fontWeight: 600, color: "#8993A1" }}>en pesos</span>
+                {formatoPesos(alumno.saldoPesos)} <span style={{ fontSize: 10, fontWeight: 600, color: "#8993A1" }}>en pesos (tu 40%)</span>
+                {alumno.costoEstudiante != null && (
+                  <div style={{ fontSize: 11, color: "#8993A1", marginTop: 4, fontWeight: 500 }}>
+                    Cada viaje te descuenta {formatoPesos(alumno.costoEstudiante)} (40% del boleto)
+                  </div>
+                )}
               </div>
             </div>
           </div>

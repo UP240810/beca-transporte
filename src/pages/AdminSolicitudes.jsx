@@ -121,10 +121,12 @@ function AsignarRutas({ trayectos, rutasCatalogo, asignaciones, setAsignaciones 
               onChange={(e) => {
                 const id = e.target.value;
                 const r = rutasCatalogo.find((x) => String(x.id) === String(id));
+                const costoRuta = r && Number(r.costo_por_viaje) > 0 ? Number(r.costo_por_viaje) : null;
                 setSlot(i, {
                   rutaId: id,
-                  costo: r ? String(r.costo_por_viaje ?? 15) : slot.costo,
-                  descuento: r ? String(r.descuento_pct ?? 50) : slot.descuento,
+                  // Si el catálogo trae $0, no pises lo que el usuario ya escribió
+                  costo: costoRuta != null ? String(costoRuta) : (slot.costo && Number(slot.costo) > 0 ? slot.costo : "15"),
+                  descuento: r ? String(r.descuento_pct ?? 60) : slot.descuento,
                 });
               }}
               style={{ ...inputStyle, appearance: "none" }}
@@ -203,13 +205,20 @@ function AsignarRutas({ trayectos, rutasCatalogo, asignaciones, setAsignaciones 
 
 function construirRutasAsignadas(asignaciones) {
   return asignaciones.map((slot) => {
+    const costo = Number(slot.costo);
+    const descuento = Number(slot.descuento);
     if (slot.modo === "existente") {
-      return { rutaId: Number(slot.rutaId) };
+      return {
+        rutaId: Number(slot.rutaId),
+        costo_por_viaje: Number.isFinite(costo) && costo > 0 ? costo : undefined,
+        descuento_pct: Number.isFinite(descuento) && descuento >= 0 ? descuento : undefined,
+      };
     }
     return {
       nombre: (slot.nombreNuevo || "").trim(),
-      costo_por_viaje: Number(slot.costo) || 15,
-      descuento_pct: Number(slot.descuento) >= 0 ? Number(slot.descuento) : 50,
+      codigo: (slot.codigoNuevo || "").trim() || undefined,
+      costo_por_viaje: Number.isFinite(costo) && costo > 0 ? costo : 15,
+      descuento_pct: Number.isFinite(descuento) && descuento >= 0 ? descuento : 50,
     };
   });
 }
@@ -669,7 +678,11 @@ export default function AdminSolicitudes() {
         userLabel={staff?.nombre}
         onLogout={() => { logout(); navigate("/acceso"); }}
         extra={
-          <button type="button" onClick={() => navigate("/personal")} style={{ background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 12 }}>Personal</button>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button type="button" onClick={() => navigate("/admin/rutas")} style={{ background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 12 }}>Rutas</button>
+            <button type="button" onClick={() => navigate("/admin/alumnos")} style={{ background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 12 }}>Alumnos</button>
+            <button type="button" onClick={() => navigate("/personal")} style={{ background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 12 }}>Personal</button>
+          </div>
         } maxWidth={1200}>
 
       {isDesktop ? (

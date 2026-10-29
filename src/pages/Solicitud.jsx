@@ -12,10 +12,12 @@ import { comprimirImagen } from "../utils";
 import BrandLogos from "../components/BrandLogos";
 
 const ESCUELAS = [
-  "Universidad Politécnica de Aguascalientes (UPA)",
+  "Primaria — escuela de Calvillo",
+  "Secundaria — escuela de Calvillo",
   "CBTIS 191 Calvillo",
   "Preparatoria Regional de Calvillo",
-  "Otra",
+  "Universidad / superior en Calvillo",
+  "Otra escuela de Calvillo",
 ];
 const GRADOS = [
   "1er semestre", "2do semestre", "3er semestre", "4to semestre",
@@ -262,7 +264,7 @@ export default function Solicitud() {
       if (!form.escuela) { errs.escuela = true; msgs.push("Selecciona institución"); }
       if (!form.carrera.trim()) { errs.carrera = true; msgs.push("Carrera obligatoria"); }
       if (!form.grado) { errs.grado = true; msgs.push("Selecciona grado"); }
-      if (!form.matricula.trim()) { errs.matricula = true; msgs.push("Matrícula obligatoria"); }
+      if (!form.matricula.trim()) { errs.matricula = true; msgs.push("Número de estudiante obligatorio"); }
       if (!foto) { errs.foto = true; msgs.push("Foto del estudiante obligatoria"); }
     }
     if (p === 1) {
@@ -470,7 +472,7 @@ export default function Solicitud() {
               <Select value={form.grado} onChange={(e) => setF("grado", e.target.value)} options={GRADOS} placeholder="Grado" />
             </Field>
           </div>
-          <Field label="Matrícula o número de control"><input required value={form.matricula} onChange={(e) => setF("matricula", e.target.value)} style={inputStyle()} className="f-mono" /></Field>
+          <Field label="Número de estudiante"><input required value={form.matricula} onChange={(e) => setF("matricula", e.target.value)} style={inputStyle()} className="f-mono" placeholder="El que use tu escuela (no hace falta que sea UPA)" /></Field>
           <Field label="Foto del estudiante (obligatoria)" icon={Camera}>
             {foto ? (
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -530,7 +532,7 @@ export default function Solicitud() {
             <div key={i} style={{ marginBottom: 10, padding: 10, background: C.paper, borderRadius: 10 }}>
               <div style={{ fontSize: 13.9, fontWeight: 700, color: C.navy, marginBottom: 6 }}>Trayecto {i + 1}</div>
               <input placeholder="Origen (ej. Calvillo Centro)" value={t.origen} onChange={(e) => setTrayectos((arr) => arr.map((x, j) => j === i ? { ...x, origen: e.target.value } : x))} style={{ ...inputStyle(), marginBottom: 6 }} required />
-              <input placeholder="Destino (ej. UPA Aguascalientes)" value={t.destino} onChange={(e) => setTrayectos((arr) => arr.map((x, j) => j === i ? { ...x, destino: e.target.value } : x))} style={inputStyle()} required />
+              <input placeholder="Destino (ej. secundaria / preparatoria / universidad en Calvillo)" value={t.destino} onChange={(e) => setTrayectos((arr) => arr.map((x, j) => j === i ? { ...x, destino: e.target.value } : x))} style={inputStyle()} required />
             </div>
           ))}
         </Section>}

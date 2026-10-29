@@ -129,14 +129,18 @@ router.get("/historial", authRequired(["alumno"]), (req, res) => {
       detalle,
       fecha: v.creado_en,
       viajes: valido ? -1 : 0,
-      monto: valido ? -(v.costo_por_viaje || 0) : 0,
+      monto: valido ? -cobroEstudiante(v.costo_por_viaje || 0) : 0,
       resultado: v.resultado,
       signo: valido ? "-" : "·",
     });
   }
 
   // Ordenar por fecha descendente y cortar
-  movimientos.sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
+  movimientos.sort((a, b) => {
+    const tb = Date.parse(String(b.fecha).replace(' ', 'T')) || 0;
+    const ta = Date.parse(String(a.fecha).replace(' ', 'T')) || 0;
+    return tb - ta; // más reciente primero
+  });
   const lista = movimientos.slice(0, limit);
 
   res.json({

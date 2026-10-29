@@ -271,8 +271,8 @@ function dibujarReverso() {
   });
 
   ctx.font = `400 17px ${SANS}`;
-  lineas(ctx, "Credencial válida impresa a color, con fotografía y enmicada. Para viajar, muestra tu pase digital en la app.", W - 96, 2)
-    .forEach((l, i) => texto(ctx, l, 48, H - 52 + i * 22, { font: `400 17px ${SANS}`, color: "rgba(255,255,255,0.8)" }));
+  lineas(ctx, "Pase PERSONAL e intransferible. No puede compartirse con nadie. Credencial válida impresa a color, con foto y enmicada. Para viajar, muestra tu pase digital en la app.", W - 96, 3)
+    .forEach((l, i) => texto(ctx, l, 48, H - 68 + i * 20, { font: `600 16px ${SANS}`, color: "rgba(255,255,255,0.9)" }));
 
   return canvas;
 }

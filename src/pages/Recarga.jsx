@@ -14,6 +14,7 @@ import { formatFechaHora } from "../utils";
 import BrandLogos from "../components/BrandLogos";
 import { StaffLayout } from "../components/GovShell";
 
+const MONTO_MAX_RECARGA = 500;
 const READER_ID = "qr-reader-ventanilla";
 
 function ResumenDia({ resumen }) {
@@ -548,8 +549,15 @@ export default function Recarga() {
     }
   }
 
-  async function confirmarRecarga() {
+  async async function confirmarRecarga() {
     if (!seleccionado) return;
+    const montoCalc = modo === "viajes"
+      ? (Number(numViajes) || 0) * (Number(seleccionado.costoEstudiante) || 0)
+      : (Number(montoPesos) || 0);
+    if (montoCalc > MONTO_MAX_RECARGA) {
+      setError(`El límite por recarga es $${MONTO_MAX_RECARGA}. Reduce el monto o la cantidad de viajes.`);
+      return;
+    }
     setProcesando(true);
     setError("");
     try {

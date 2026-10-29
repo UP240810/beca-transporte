@@ -12,6 +12,7 @@ const MENSAJES = {
   "sin-saldo": "Saldo insuficiente. El estudiante debe recargar en la Presidencia Municipal.",
   revocado: "Pase revocado o alumno dado de baja. No se permite el viaje.",
   "pase-usado": "Este pase ya fue utilizado. El estudiante debe abrir su app y mostrar el pase nuevo.",
+  cooldown: "Este estudiante ya fue validado hace menos de 30 minutos. Espera media hora entre viajes.",
 };
 
 function rutasDelAlumno(alumnoId) {
@@ -119,6 +120,24 @@ router.post("/", authRequired(["camionero"]), (req, res) => {
     resultado = "sin-saldo";
   } else {
     resultado = "valido";
+  }
+
+  // Si el chofer evaluó offline y rechazó (sin saldo / ruta), NO cobrar al sincronizar
+  // aunque el alumno haya recargado después. Solo se registra el rechazo.
+  const resultadoLocal = req.body?.resultadoLocal;
+  if (resultadoLocal === "sin-saldo" || resultadoLocal === "ruta-incorrecta") {
+    resultado = resultadoLocal;
+  }
+
+  // Cooldown: mínimo 30 minutos entre validaciones exitosas del mismo alumno
+  if (resultado === "valido") {
+    const reciente = db.prepare(`
+      SELECT 1 AS ok FROM viajes_consumidos
+      WHERE alumno_id = ? AND resultado = 'valido'
+        AND datetime(creado_en) > datetime('now', '-30 minutes')
+      LIMIT 1
+    `).get(alumno.id);
+    if (reciente) resultado = "cooldown";
   }
 
   const registrar = db.transaction(() => {

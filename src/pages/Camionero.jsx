@@ -21,6 +21,7 @@ const ESTADOS = {
   "ruta-incorrecta": { color: "#fff", bg: C.garnet, icon: XCircle, titulo: "RUTA INCORRECTA", msg: "Este estudiante no tiene descuento en la ruta de este turno." },
   "sin-saldo": { color: "#fff", bg: "#B45309", icon: AlertTriangle, titulo: "SALDO INSUFICIENTE", msg: "Debe recargar en la Presidencia Municipal." },
   revocado: { color: "#fff", bg: "#6B1F2A", icon: XCircle, titulo: "PASE REVOCADO", msg: "QR invalidado o alumno dado de baja." },
+  cooldown: { color: "#fff", bg: "#B45309", icon: XCircle, titulo: "ESPERA 30 MIN", msg: "Este estudiante ya viajó hace menos de media hora." },
   "pase-usado": { color: "#fff", bg: "#7A1F1F", icon: XCircle, titulo: "PASE YA USADO", msg: "Este pase ya fue utilizado. Debe mostrar el pase nuevo desde su app." },
   "no-encontrado": { color: "#fff", bg: C.garnet, icon: XCircle, titulo: "NO RECONOCIDO", msg: "No está en el manifiesto de esta ruta (offline) o no existe." },
 };
@@ -408,19 +409,35 @@ export default function Camionero() {
   async function procesarEscaneoOffline(qrToken, matriculaDirecta) {
     const matricula = matriculaDirecta || leerMatriculaSinVerificar(qrToken);
     if (!matricula) { setError("No se pudo leer este código sin conexión."); return; }
+    // Cooldown local 30 min entre validaciones del mismo alumno
+    const hace30 = Date.now() - 30 * 60 * 1000;
+    const reciente = escaneos.find((e) => e.matricula === matricula && e.resultado === "valido" && Date.parse(String(e.hora).replace(" ", "T")) >= hace30);
+    if (reciente) {
+      mostrarResultado({
+        resultado: "cooldown",
+        mensaje: "Este estudiante ya fue validado hace menos de 30 minutos.",
+        alumno: { nombre: reciente.nombre, matricula, ruta: activo.rutaNombre, viajesRestantes: "—" },
+      });
+      return;
+    }
     const manifiesto = await obtenerManifiesto(rutaId);
     const { resultado: resLocal, alumno } = evaluarLocal(manifiesto, matricula);
     if (resLocal === "sin-manifiesto") { setError("No hay datos locales de esta ruta. Conéctate para descargarlos."); return; }
     if (resLocal === "valido") await descontarLocal(rutaId, matricula);
 
-    await encolarPendiente({
-      ...(matriculaDirecta ? { matricula: matriculaDirecta } : { qrToken }),
-      rutaId,
-      recorridoClave: activo.clave,
-      resultadoLocal: resLocal,
-      ts: new Date().toISOString(),
-    });
-    setPendientesSync(await contarPendientes());
+    // Solo se encolan los VÁLIDOS para sincronizar el cobro.
+    // Si se rechazó offline (sin saldo / ruta), NO se envía después:
+    // así no se cobra si el alumno recargó al volver la señal.
+    if (resLocal === "valido") {
+      await encolarPendiente({
+        ...(matriculaDirecta ? { matricula: matriculaDirecta } : { qrToken }),
+        rutaId,
+        recorridoClave: activo.clave,
+        resultadoLocal: resLocal,
+        ts: new Date().toISOString(),
+      });
+      setPendientesSync(await contarPendientes());
+    }
     const res = resLocal === "no-encontrado" ? "ruta-incorrecta" : resLocal;
     mostrarResultado({
       resultado: res,

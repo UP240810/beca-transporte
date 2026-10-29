@@ -142,6 +142,8 @@ router.post("/", authRequired(["ventanilla"]), (req, res) => {
   viajes = Number(viajes);
   monto = Number(monto);
 
+  const MONTO_MAX_RECARGA = 500;
+
   if (Number.isFinite(viajes) && viajes > 0) {
     modo = "viajes";
     viajes = Math.floor(viajes);
@@ -152,15 +154,24 @@ router.post("/", authRequired(["ventanilla"]), (req, res) => {
     viajes = Math.floor(monto / costoPorViaje);
     if (viajes < 1) {
       return res.status(400).json({
-        error: `El monto mínimo es $${costoPorViaje} (1 viaje). Recibido: $${monto}.`,
+        error: `El monto mínimo es $${costoPorViaje} (1 viaje al 40%). Recibido: $${monto}.`,
       });
     }
-    // Registramos el monto realmente cobrado = viajes * costo (coherente con lo acreditado)
-    // Si el municipio cobró de más en efectivo, el sobrante lo maneja la caja manualmente.
+    // Registramos el monto realmente cobrado = viajes * costo estudiante (40%)
     const montoAcreditado = viajes * costoPorViaje;
     monto = montoAcreditado;
   } else {
     return res.status(400).json({ error: "Indica un número de viajes o un monto en pesos mayor a cero." });
+  }
+
+  if (monto > MONTO_MAX_RECARGA) {
+    const maxViajes = Math.floor(MONTO_MAX_RECARGA / costoPorViaje);
+    return res.status(400).json({
+      error: `El límite por recarga es $${MONTO_MAX_RECARGA}. Con el costo del estudiante ($${costoPorViaje}/viaje) el máximo es ${maxViajes} viaje(s).`,
+      limite: MONTO_MAX_RECARGA,
+      costoPorViajeEstudiante: costoPorViaje,
+      maxViajes,
+    });
   }
 
   const saldoAnterior = alumno.viajes_restantes;

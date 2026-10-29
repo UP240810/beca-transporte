@@ -116,6 +116,7 @@ export async function sincronizarColaConApi(token, apiValidar) {
       if (item.matricula) body.matricula = item.matricula;
       if (item.ts) body.escaneadoEn = item.ts;
       if (item.recorridoClave) body.recorridoClave = item.recorridoClave;
+      if (item.resultadoLocal) body.resultadoLocal = item.resultadoLocal;
       await apiValidar(body, token);
       await quitarPendiente(item.id);
       ok += 1;

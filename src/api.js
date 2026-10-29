@@ -68,7 +68,10 @@ const api = {
 
   // Rutas
   rutas: () => request("/rutas"),
+  rutasAdmin: (token) => request("/rutas/admin", { token }),
   crearRuta: (datos, token) => request("/rutas", { method: "POST", body: datos, token }),
+  actualizarRuta: (id, datos, token) => request(`/rutas/${id}`, { method: "PATCH", body: datos, token }),
+  eliminarRuta: (id, token, hard = false) => request(`/rutas/${id}${hard ? "?hard=1" : ""}`, { method: "DELETE", token }),
   manifiestoRuta: (rutaId, token) => request(`/rutas/${rutaId}/manifiesto`, { token }),
 
   // Solicitudes

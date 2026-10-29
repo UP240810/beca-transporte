@@ -23,7 +23,7 @@ const PREGUNTAS = [
       },
       {
         q: "No sé el nombre exacto de mi ruta",
-        a: "En el formulario escribe libremente de qué punto a qué punto viajas (por ejemplo: «De Malpaso a UPA»). Al aprobar, Recaudación asigna el nombre oficial y el costo de la ruta.",
+        a: "En el formulario escribe libremente de qué punto a qué punto viajas (por ejemplo: «De Malpaso a la preparatoria»). Al aprobar, Recaudación asigna el nombre oficial y el costo de la ruta.",
       },
     ],
   },

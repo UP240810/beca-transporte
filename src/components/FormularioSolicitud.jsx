@@ -93,7 +93,7 @@ export default function FormularioSolicitud({ solicitud, token, onCerrar }) {
       aria-modal="true"
       aria-label={`Formulario completo de ${solicitud.nombre} ${solicitud.apellidos}`}
       className="form-modal"
-      style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,26,51,0.6)", display: "flex", justifyContent: "center", alignItems: "flex-start", overflowY: "auto", padding: "clamp(8px, 3vw, 28px)" }}
+      style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,26,51,0.6)", display: "flex", justifyContent: "center", alignItems: "center", padding: "clamp(12px, 2.5vw, 24px)", boxSizing: "border-box" }}
       onClick={(ev) => { if (ev.target === ev.currentTarget) onCerrar(); }}
     >
       <style>{`
@@ -102,11 +102,11 @@ export default function FormularioSolicitud({ solicitud, token, onCerrar }) {
           .form-modal, .form-modal * { visibility: visible !important; }
           .form-modal { position: absolute !important; inset: 0 !important; background: #fff !important; padding: 0 !important; overflow: visible !important; }
           .form-modal .no-print { display: none !important; }
-          .form-modal .form-sheet { box-shadow: none !important; max-width: 100% !important; }
+          .form-modal .form-sheet { box-shadow: none !important; max-width: 100% !important; max-height: none !important; height: auto !important; }
         }
       `}</style>
-      <div className="form-sheet" style={{ background: C.paper, width: "100%", maxWidth: 900, borderRadius: 14, boxShadow: "0 20px 60px rgba(0,0,0,0.35)" }}>
-        <div style={{ position: "sticky", top: 0, zIndex: 2, background: C.navy, color: "#fff", borderRadius: "14px 14px 0 0", padding: "14px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+      <div className="form-sheet" style={{ background: C.paper, width: "100%", maxWidth: 900, maxHeight: "min(92vh, 960px)", borderRadius: 14, boxShadow: "0 20px 60px rgba(0,0,0,0.35)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        <div style={{ flexShrink: 0, background: C.navy, color: "#fff", borderRadius: "14px 14px 0 0", padding: "14px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <div style={{ minWidth: 0 }}>
             <div style={{ fontWeight: 700, fontSize: 17 }}>Formulario completo de solicitud</div>
             <div className="f-mono" style={{ fontSize: 12, opacity: 0.85 }}>{solicitud.folio} · recibida {formatFechaHora(solicitud.creado_en)}</div>
@@ -121,7 +121,7 @@ export default function FormularioSolicitud({ solicitud, token, onCerrar }) {
           </div>
         </div>
 
-        <div style={{ padding: "16px clamp(12px, 3vw, 22px) 22px" }}>
+        <div style={{ padding: "16px clamp(12px, 3vw, 22px) 22px", overflowY: "auto", flex: 1, minHeight: 0, WebkitOverflowScrolling: "touch" }}>
           <Seccion icon={User} titulo="Datos del solicitante">
             <div style={{ display: "flex", gap: 16, alignItems: "flex-start", flexWrap: "wrap" }}>
               {solicitud.foto_base64 && (

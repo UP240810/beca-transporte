@@ -12,6 +12,7 @@ import Acceso from "./pages/Acceso";
 import Solicitud from "./pages/Solicitud";
 import StaffLogin from "./pages/StaffLogin";
 import AdminSolicitudes from "./pages/AdminSolicitudes";
+import AdminRutas from "./pages/AdminRutas";
 import AdminAlumnos from "./pages/AdminAlumnos";
 import AdminBugs from "./pages/AdminBugs";
 import AlumnoLogin from "./pages/AlumnoLogin";
@@ -62,10 +63,26 @@ export default function App() {
             <Route path="/desarrollo/login" element={<StaffLogin rol="desarrollo_social" />} />
             <Route path="/recaudacion/login" element={<StaffLogin rol="recaudacion" />} />
             <Route
+              path="/admin"
+              element={
+                <ProtectedRoute rol="desarrollo_social" loginPath="/admin/login">
+                  <AdminSolicitudes />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/admin/solicitudes"
               element={
                 <ProtectedRoute rol="desarrollo_social" loginPath="/admin/login">
                   <AdminSolicitudes />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/rutas"
+              element={
+                <ProtectedRoute roles={["desarrollo_social", "recaudacion"]} loginPath="/admin/login">
+                  <AdminRutas />
                 </ProtectedRoute>
               }
             />

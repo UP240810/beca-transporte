@@ -240,8 +240,15 @@ router.post("/:folio/aprobar", authRequired(["desarrollo_social"]), async (req, 
     const rawRutas = req.body.rutasAsignadas;
     if (Array.isArray(rawRutas)) {
       for (let i = 0; i < rawRutas.length; i++) {
-        const c = Number(rawRutas[i].costo_por_viaje);
-        if (!Number.isFinite(c) || c <= 0) {
+        const item = rawRutas[i] || {};
+        const cBody = Number(item.costo_por_viaje);
+        if (item.rutaId) {
+          if (Number.isFinite(cBody) && cBody > 0) continue;
+          const ruta = db.prepare(`SELECT costo_por_viaje FROM rutas WHERE id = ?`).get(Number(item.rutaId));
+          if (ruta && Number(ruta.costo_por_viaje) > 0) continue;
+          return res.status(400).json({ error: `Indica el precio por viaje de la ruta ${i + 1} (mayor a 0).` });
+        }
+        if (!Number.isFinite(cBody) || cBody <= 0) {
           return res.status(400).json({ error: `Indica el precio por viaje de la ruta ${i + 1} (mayor a 0).` });
         }
       }
