@@ -810,7 +810,7 @@ export default function Camionero() {
                               <td style={{ padding: "8px 10px", whiteSpace: "nowrap" }} className="f-mono">{String(f.fecha).slice(0, 16)}</td>
                               <td style={{ padding: "8px 10px" }}>
                                 <div style={{ fontWeight: 600, color: C.navy }}>{f.nombre || "—"}</div>
-                                <div className="f-mono" style={{ fontSize: 11, color: "#8993A1" }}>{f.idEstudiante || f.matricula || ""}}</div>
+                                <div className="f-mono" style={{ fontSize: 11, color: "#8993A1" }}>{f.idEstudiante || f.matricula || "—"}}</div>
                               </td>
                               <td style={{ padding: "8px 10px" }}>{f.ruta || "—"}</td>
                               <td style={{ padding: "8px 10px", textAlign: "right" }} className="f-mono">${f.costo90 ?? 0}</td>

@@ -549,7 +549,7 @@ export default function Recarga() {
     }
   }
 
-  async async function confirmarRecarga() {
+  async function confirmarRecarga() {
     if (!seleccionado) return;
     const montoCalc = modo === "viajes"
       ? (Number(numViajes) || 0) * (Number(seleccionado.costoEstudiante) || 0)
