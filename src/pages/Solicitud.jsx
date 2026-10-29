@@ -12,17 +12,26 @@ import { comprimirImagen } from "../utils";
 import BrandLogos from "../components/BrandLogos";
 
 const ESCUELAS = [
-  { value: "Primaria de Calvillo", abrev: "prim" },
-  { value: "Secundaria de Calvillo", abrev: "sec" },
+  // Primarias
+  { value: "Primaria Adolfo López Mateos (Calvillo)", abrev: "prim" },
+  { value: "Primaria Miguel Hidalgo (Calvillo)", abrev: "prim" },
+  { value: "Primaria Henry Ford 62 (Calvillo)", abrev: "prim" },
+  { value: "Primaria Vicente Guerrero (Calvillo)", abrev: "prim" },
+  { value: "Primaria Francisco González Bocanegra (La Panadera)", abrev: "prim" },
+  { value: "Primaria 18 de Marzo (Los Patos)", abrev: "prim" },
+  { value: "Primaria 20 de Noviembre (Ojocaliente)", abrev: "prim" },
+  // Secundarias
+  { value: "Secundaria General Núm. 22, Izcóatl (Calvillo)", abrev: "sec" },
+  { value: "Secundaria General Núm. 23, Rafael Ramírez Castañeda (Ojocaliente)", abrev: "sec" },
+  { value: "Secundaria General Núm. 35, Valle de Huéjucar (Calvillo)", abrev: "sec" },
+  { value: "Secundaria Técnica Núm. 17 (Ojo de Agua)", abrev: "sec" },
+  // Media superior / superior
   { value: "CBTIS 191 Calvillo", abrev: "cbtis" },
   { value: "CBTA 61 Calvillo", abrev: "cbta" },
   { value: "Preparatoria Regional de Calvillo", abrev: "prepa" },
-  { value: "Universidad Tecnológica de Calvillo", abrev: "utc" },
+  { value: "Universidad Tecnológica de Calvillo (El Salitre)", abrev: "utc" },
+  { value: "Universidad para el Bienestar Benito Juárez de Calvillo", abrev: "ubbj" },
   { value: "Otra escuela de Calvillo", abrev: "esc" },
-];
-const GRADOS = [
-  "1er semestre", "2do semestre", "3er semestre", "4to semestre",
-  "5to semestre", "6to semestre", "7mo semestre", "8vo semestre", "9no semestre",
 ];
 
 const PARENTESCO = [
@@ -263,8 +272,7 @@ export default function Solicitud() {
       if (dig(form.celular).length !== 10) { errs.celular = true; msgs.push("Celular: 10 dígitos"); }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.correo.trim())) { errs.correo = true; msgs.push("Correo inválido"); }
       if (!form.escuela) { errs.escuela = true; msgs.push("Selecciona institución"); }
-      if (!form.carrera.trim()) { errs.carrera = true; msgs.push("Carrera obligatoria"); }
-      if (!form.grado) { errs.grado = true; msgs.push("Selecciona grado"); }
+      if (!form.grado.trim()) { errs.grado = true; msgs.push("Indica el grado (ej. 3° de primaria, 2° cuatrimestre)"); }
       if (!form.matricula.trim()) { errs.matricula = true; msgs.push("Número de estudiante obligatorio"); }
       if (!foto) { errs.foto = true; msgs.push("Foto del estudiante obligatoria"); }
     }
@@ -468,17 +476,22 @@ export default function Solicitud() {
             <Select value={form.escuela} onChange={(e) => setF("escuela", e.target.value)} options={ESCUELAS.map((e) => typeof e === "string" ? e : e.value)} placeholder="Selecciona" />
           </Field>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-            <Field label="Carrera / especialidad"><input required value={form.carrera} onChange={(e) => setF("carrera", e.target.value)} style={inputStyle()} /></Field>
-            <Field label="Grado">
-              <Select value={form.grado} onChange={(e) => setF("grado", e.target.value)} options={GRADOS} placeholder="Grado" />
+            <Field label="Carrera / especialidad (opcional)">
+              <input value={form.carrera} onChange={(e) => setF("carrera", e.target.value)} style={inputStyle()} placeholder="Solo si aplica (prepa / universidad)" />
+            </Field>
+            <Field label="Grado o año escolar">
+              <input required value={form.grado} onChange={(e) => setF("grado", e.target.value)} style={inputStyle(fieldErrors.grado)} placeholder="Ej. 2° de primaria, 1er cuatrimestre, 3° de secundaria" />
             </Field>
           </div>
           <Field label="Número de estudiante"><input required value={form.matricula} onChange={(e) => setF("matricula", e.target.value.toLowerCase().replace(/\s/g, ""))} style={inputStyle()} className="f-mono" placeholder="Ej. cbtis2024, cbta2023, utc2025, prepa2024…" /><div style={{ fontSize: 11, color: "#8993A1", marginTop: 4 }}>Usa la abreviatura de tu escuela + año o folio (ej. <span className="f-mono">cbta2023</span>, <span className="f-mono">utc2024</span>). No uses prefijos UPA.</div></Field>
-          <Field label="Foto del estudiante (obligatoria)" icon={Camera}>
+          <Field label="Foto del estudiante — tamaño infantil (obligatoria)" icon={Camera}>
             {foto ? (
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <img src={foto} alt="" style={{ width: 56, height: 56, borderRadius: 8, objectFit: "cover" }} />
-                <button type="button" onClick={() => setFoto(null)} style={{ border: "none", background: "none", color: C.garnet, fontSize: 15.1, cursor: "pointer" }}><XIcon size={14} /> Quitar</button>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <img src={foto} alt="Foto infantil del estudiante" style={{ width: 105, height: 135, borderRadius: 6, objectFit: "cover", border: `1px solid ${C.paperDim}`, background: "#fff" }} />
+                <div>
+                  <div style={{ fontSize: 12, color: "#5B6675", marginBottom: 6 }}>Formato infantil (vertical)</div>
+                  <button type="button" onClick={() => setFoto(null)} style={{ border: "none", background: "none", color: C.garnet, fontSize: 14, cursor: "pointer" }}><XIcon size={14} /> Quitar</button>
+                </div>
               </div>
             ) : (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
