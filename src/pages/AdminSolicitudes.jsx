@@ -585,17 +585,29 @@ function DetalleSolicitud({ solicitud, token, onBack, onActualizado }) {
   );
 }
 
-function ListaSolicitudes({ filtro, setFiltro, conteos, filtradas, cargando, seleccionada, onSelect }) {
+function ListaSolicitudes({ filtro, setFiltro, conteos, filtradas, cargando, seleccionada, onSelect, onRutas }) {
   return (
     <div>
       <div className="f-display" style={{ fontSize: 16, fontWeight: 700, color: C.navy, marginBottom: 3 }}>Solicitudes</div>
       <div style={{ fontSize: 11.5, color: "#6b7785", marginBottom: 14 }}>Revisa, aprueba o pide correcciones.</div>
-      <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
+      <div style={{ display: "flex", gap: 6, marginBottom: 14, flexWrap: "wrap" }}>
         {[["pendiente", "Pendientes"], ["corregir", "En corrección"], ["aprobada", "Aprobadas"], ["rechazada", "Rechazadas"]].map(([key, label]) => (
-          <button key={key} onClick={() => setFiltro(key)} style={{ flex: 1, padding: "8px 4px", borderRadius: 9, fontSize: 11, fontWeight: 700, cursor: "pointer", border: `1px solid ${filtro === key ? C.busBlue : C.paperDim}`, background: filtro === key ? C.busBlue : "#fff", color: filtro === key ? "#fff" : C.ink }}>
+          <button key={key} onClick={() => setFiltro(key)} style={{ flex: "1 1 90px", padding: "8px 4px", borderRadius: 9, fontSize: 11, fontWeight: 700, cursor: "pointer", border: `1px solid ${filtro === key ? C.busBlue : C.paperDim}`, background: filtro === key ? C.busBlue : "#fff", color: filtro === key ? "#fff" : C.ink }}>
             {label} ({conteos[key] ?? "…"})
           </button>
         ))}
+        <button
+          type="button"
+          onClick={onRutas}
+          title="Catálogo de rutas y costos"
+          style={{
+            flex: "0 0 auto", padding: "8px 12px", borderRadius: 9, fontSize: 11, fontWeight: 700, cursor: "pointer",
+            border: `1px solid ${C.navy}`, background: C.navy, color: "#fff",
+            display: "inline-flex", alignItems: "center", gap: 5, whiteSpace: "nowrap",
+          }}
+        >
+          <Bus size={13} /> Rutas
+        </button>
       </div>
       <div style={{ background: "#fff", borderRadius: 12, border: `1px solid ${C.paperDim}`, overflow: "hidden" }}>
         {cargando ? (
@@ -688,7 +700,7 @@ export default function AdminSolicitudes() {
       {isDesktop ? (
         <div className="split-layout" style={{ padding: 20 }}>
           <div className="split-left">
-            <ListaSolicitudes filtro={filtro} setFiltro={setFiltro} conteos={conteos} filtradas={solicitudes} cargando={cargando} seleccionada={solicitudActual} onSelect={async (s) => {
+            <ListaSolicitudes filtro={filtro} setFiltro={setFiltro} conteos={conteos} filtradas={solicitudes} cargando={cargando} seleccionada={solicitudActual} onRutas={() => navigate("/admin/rutas")} onSelect={async (s) => {
             setSeleccionada(s);
             try {
               const det = await api.solicitudDetalle(s.folio, staff.token);
@@ -713,7 +725,7 @@ export default function AdminSolicitudes() {
         <DetalleSolicitud solicitud={solicitudActual} token={staff.token} onBack={() => setSeleccionada(null)} onActualizado={cargar} />
       ) : (
         <div style={{ padding: 16 }}>
-          <ListaSolicitudes filtro={filtro} setFiltro={setFiltro} conteos={conteos} filtradas={solicitudes} cargando={cargando} seleccionada={null} onSelect={async (s) => {
+          <ListaSolicitudes filtro={filtro} setFiltro={setFiltro} conteos={conteos} filtradas={solicitudes} cargando={cargando} seleccionada={null} onRutas={() => navigate("/admin/rutas")} onSelect={async (s) => {
             setSeleccionada(s);
             try {
               const det = await api.solicitudDetalle(s.folio, staff.token);
