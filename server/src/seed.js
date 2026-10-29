@@ -92,29 +92,29 @@ function seed() {
     return alumnoId;
   }
 
-  const upa = "Universidad Politécnica de Aguascalientes (UPA)";
+  const upa = "Universidad Tecnológica de Calvillo";  // legado variable
 
   const alumnoCamila = crearAlumno({
-    nombre: "Camila", apellidos: "Delgado Ruiz", telefono: "4651234567", correo: "cami.delgado@upa.edu.mx",
-    escuela: upa, carrera: "Ing. en Computación", grado: "6to semestre", matricula: "UPA-20231045",
+    nombre: "Camila", apellidos: "Delgado Ruiz", telefono: "4651234567", correo: "cami.delgado@escuela.calvillo.mx",
+    escuela: "Universidad Tecnológica de Calvillo", carrera: "Ing. en Computación", grado: "6to semestre", matricula: "utc20231045",
     viajesRestantes: 12, rutas: [rutaUPA],
   });
 
   const alumnoJorge = crearAlumno({
     nombre: "Jorge", apellidos: "Ramírez Soto", telefono: "4659876543", correo: "jorge.ramirez@cbtis191.edu.mx",
-    escuela: "CBTIS 191 Calvillo", carrera: "Técnico en Informática", grado: "4to semestre", matricula: "UPA-20230812",
+    escuela: "CBTIS 191 Calvillo", carrera: "Técnico en Informática", grado: "4to semestre", matricula: "cbtis20230812",
     viajesRestantes: 3, rutas: [rutaMalpaso, rutaUPA],
   });
 
   const alumnoAna = crearAlumno({
-    nombre: "Ana Sofía", apellidos: "Luna", telefono: "4655551122", correo: "ana.luna@upa.edu.mx",
-    escuela: upa, carrera: "Ing. Industrial", grado: "2do semestre", matricula: "UPA-20229981",
+    nombre: "Ana Sofía", apellidos: "Luna", telefono: "4655551122", correo: "ana.luna@escuela.calvillo.mx",
+    escuela: "Universidad Tecnológica de Calvillo", carrera: "Ing. Industrial", grado: "2do semestre", matricula: "prepa20229981",
     viajesRestantes: 0, rutas: [rutaCentroAgs],
   });
 
   const alumnoDiego = crearAlumno({
-    nombre: "Diego", apellidos: "Torres Vega", telefono: "4654448899", correo: "diego.torres@upa.edu.mx",
-    escuela: upa, carrera: "Ing. en Mecatrónica", grado: "3er semestre", matricula: "UPA-20225567",
+    nombre: "Diego", apellidos: "Torres Vega", telefono: "4654448899", correo: "diego.torres@escuela.calvillo.mx",
+    escuela: "Universidad Tecnológica de Calvillo", carrera: "Ing. en Mecatrónica", grado: "3er semestre", matricula: "utc20225567",
     viajesRestantes: 7, rutas: [rutaUPA],
   });
 
@@ -128,21 +128,21 @@ function seed() {
   );
 
   const sol1 = insertSolicitud.run(
-    "SOL-3321-2026", "Fernanda", "López Cruz", "4657778899", "fer.lopez@upa.edu.mx",
-    upa, "Ing. en Biotecnología", "5to semestre", "UPA-20233321", "pendiente", null
+    "SOL-3321-2026", "Fernanda", "López Cruz", "4657778899", "fer.lopez@escuela.calvillo.mx",
+    "Universidad Tecnológica de Calvillo", "Ing. en Biotecnología", "5to semestre", "utc20233321", "pendiente", null
   ).lastInsertRowid;
   insertTrayecto.run(sol1, 1, "De Calvillo Centro a UPA (Aguascalientes)");
 
   const sol2 = insertSolicitud.run(
     "SOL-7742-2026", "Miguel Ángel", "Torres Ibarra", "4653332211", "miguel.torres@cbtis191.edu.mx",
-    "CBTIS 191 Calvillo", "Técnico en Contabilidad", "2do semestre", "UPA-20237742", "pendiente", null
+    "CBTIS 191 Calvillo", "Técnico en Contabilidad", "2do semestre", "cbtis20237742", "pendiente", null
   ).lastInsertRowid;
   insertTrayecto.run(sol2, 1, "De Malpaso a Calvillo Centro");
   insertTrayecto.run(sol2, 2, "De Calvillo Centro a UPA");
 
   const sol3 = insertSolicitud.run(
-    "SOL-5510-2026", "Paola", "Hernández Gil", "4656665544", "paola.hg@upa.edu.mx",
-    upa, "Ing. Industrial", "1er semestre", "UPA-2023551O", "corregir",
+    "SOL-5510-2026", "Paola", "Hernández Gil", "4656665544", "paola.hg@escuela.calvillo.mx",
+    "Preparatoria Regional de Calvillo", "Bachillerato", "1er semestre", "prepa20235510", "corregir",
     "Matrícula no coincide con el formato de la UPA."
   ).lastInsertRowid;
   insertTrayecto.run(sol3, 1, "De Ojocaliente a Aguascalientes Centro");
@@ -170,7 +170,7 @@ function seed() {
   console.log("Cuentas de prueba (todas con la misma contraseña de demo):");
   console.log(`  contraseña para todas: ${DEMO_PASSWORD}`);
   console.log("");
-  console.log("  Alumnos:      upa-20231045 · upa-20230812 · upa-20229981 · upa-20225567");
+  console.log("  Alumnos:      utc20231045 · cbtis20230812 · prepa20229981 · utc20225567");
   console.log("  Desarrollo Social: desarrollo.social");
   console.log("  Recaudación:       recaudacion.andres");
   console.log("  Ventanilla:        ventanilla.01 / ventanilla.02");

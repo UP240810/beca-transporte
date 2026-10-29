@@ -334,21 +334,31 @@ export default function AlumnoDashboard() {
             <Bus size={13} color={C.navy} />
             <span style={{ fontSize: 11.5, fontWeight: 700, color: C.navy }}>Tus rutas con descuento</span>
           </div>
-          {alumno.rutas.map((r, i) => (
+          {alumno.rutas.map((r, i) => {
+            const boleto = Number(r.costoPorViaje) || 0;
+            const paga = boleto > 0 ? Math.max(1, Math.round(boleto * 0.4)) : (alumno.costoEstudiante || 0);
+            return (
             <div
               key={i}
               style={{
                 background: `${C.mint}1F`, border: `1px solid ${C.mint}`, borderRadius: 12,
-                padding: "11px 13px", display: "flex", justifyContent: "space-between", alignItems: "center",
+                padding: "11px 13px",
                 marginBottom: i < alumno.rutas.length - 1 ? 8 : 0,
               }}
             >
-              <span style={{ fontSize: 12, fontWeight: 600, color: C.navy }}>{r.nombre}</span>
-              <span className="f-mono" style={{ fontSize: 9.5, fontWeight: 700, color: "#fff", background: C.garnet, borderRadius: 999, padding: "3px 8px" }}>
-                -{r.descuento}
-              </span>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: C.navy }}>{r.nombre}</span>
+                <span className="f-mono" style={{ fontSize: 9.5, fontWeight: 700, color: "#fff", background: C.garnet, borderRadius: 999, padding: "3px 8px", flexShrink: 0 }}>
+                  -{r.descuento}
+                </span>
+              </div>
+              <div style={{ marginTop: 6, fontSize: 11.5, color: "#5B6675", lineHeight: 1.4 }}>
+                Boleto <strong className="f-mono" style={{ color: C.navy }}>{formatoPesos(boleto)}</strong>
+                {" · "}Tú pagas <strong className="f-mono" style={{ color: C.navy }}>{formatoPesos(paga)}</strong> (40%)
+              </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Uso del mes */}

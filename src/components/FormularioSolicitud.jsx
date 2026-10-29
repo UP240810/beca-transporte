@@ -93,7 +93,7 @@ export default function FormularioSolicitud({ solicitud, token, onCerrar }) {
       aria-modal="true"
       aria-label={`Formulario completo de ${solicitud.nombre} ${solicitud.apellidos}`}
       className="form-modal"
-      style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,26,51,0.6)", display: "flex", justifyContent: "center", alignItems: "center", padding: "clamp(12px, 2.5vw, 24px)", boxSizing: "border-box" }}
+      style={{ position: "fixed", inset: 0, zIndex: 4000, background: "rgba(0,26,51,0.55)", display: "flex", justifyContent: "center", alignItems: "flex-start", padding: "max(12px, env(safe-area-inset-top)) 12px 16px", boxSizing: "border-box", overflowY: "auto", WebkitOverflowScrolling: "touch" }}
       onClick={(ev) => { if (ev.target === ev.currentTarget) onCerrar(); }}
     >
       <style>{`
@@ -105,8 +105,8 @@ export default function FormularioSolicitud({ solicitud, token, onCerrar }) {
           .form-modal .form-sheet { box-shadow: none !important; max-width: 100% !important; max-height: none !important; height: auto !important; }
         }
       `}</style>
-      <div className="form-sheet" style={{ background: C.paper, width: "100%", maxWidth: 900, maxHeight: "min(92vh, 960px)", borderRadius: 14, boxShadow: "0 20px 60px rgba(0,0,0,0.35)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <div style={{ flexShrink: 0, background: C.navy, color: "#fff", borderRadius: "14px 14px 0 0", padding: "14px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+      <div className="form-sheet" style={{ background: C.paper, width: "100%", maxWidth: 900, margin: "0 auto 24px", borderRadius: 14, boxShadow: "0 20px 60px rgba(0,0,0,0.35)", display: "flex", flexDirection: "column", maxHeight: "none" }}>
+        <div style={{ position: "sticky", top: 0, zIndex: 2, background: C.navy, color: "#fff", borderRadius: "14px 14px 0 0", padding: "14px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <div style={{ minWidth: 0 }}>
             <div style={{ fontWeight: 700, fontSize: 17 }}>Formulario completo de solicitud</div>
             <div className="f-mono" style={{ fontSize: 12, opacity: 0.85 }}>{solicitud.folio} · recibida {formatFechaHora(solicitud.creado_en)}</div>
@@ -121,11 +121,16 @@ export default function FormularioSolicitud({ solicitud, token, onCerrar }) {
           </div>
         </div>
 
-        <div style={{ padding: "16px clamp(12px, 3vw, 22px) 22px", overflowY: "auto", flex: 1, minHeight: 0, WebkitOverflowScrolling: "touch" }}>
+        <div style={{ padding: "16px clamp(12px, 3vw, 22px) 28px" }}>
           <Seccion icon={User} titulo="Datos del solicitante">
             <div style={{ display: "flex", gap: 16, alignItems: "flex-start", flexWrap: "wrap" }}>
-              {solicitud.foto_base64 && (
-                <img src={solicitud.foto_base64} alt="Foto del estudiante" style={{ width: 110, height: 110, objectFit: "cover", borderRadius: 12, border: `1px solid ${C.paperDim}` }} />
+              {solicitud.foto_base64 ? (
+                <div style={{ textAlign: "center" }}>
+                  <img src={solicitud.foto_base64} alt="Foto infantil del estudiante" style={{ width: 120, height: 150, objectFit: "cover", borderRadius: 6, border: `1px solid ${C.paperDim}`, display: "block", background: "#fff" }} />
+                  <div style={{ fontSize: 10, color: "#8993A1", marginTop: 4 }}>Foto infantil</div>
+                </div>
+              ) : (
+                <div style={{ width: 120, height: 150, borderRadius: 6, border: `1px dashed ${C.paperDim}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#8993A1", textAlign: "center", padding: 8 }}>Sin foto</div>
               )}
               <div style={{ ...grid, flex: 1, minWidth: 240 }}>
                 <Dato label="Nombre(s)">{val(solicitud.nombre)}</Dato>
@@ -147,9 +152,9 @@ export default function FormularioSolicitud({ solicitud, token, onCerrar }) {
           <Seccion icon={GraduationCap} titulo="Datos escolares">
             <div style={grid}>
               <Dato label="Institución educativa" ancho={2}>{val(solicitud.escuela)}</Dato>
-              <Dato label="Carrera / especialidad">{val(solicitud.carrera)}</Dato>
+              <Dato label="Carrera / especialidad (si aplica)">{val(solicitud.carrera)}</Dato>
               <Dato label="Grado">{val(solicitud.grado)}</Dato>
-              <Dato label="Matrícula o número de control">{val(solicitud.matricula)}</Dato>
+              <Dato label="Número de estudiante">{val(solicitud.matricula)}</Dato>
             </div>
           </Seccion>
 

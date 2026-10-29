@@ -12,12 +12,13 @@ import { comprimirImagen } from "../utils";
 import BrandLogos from "../components/BrandLogos";
 
 const ESCUELAS = [
-  "Primaria — escuela de Calvillo",
-  "Secundaria — escuela de Calvillo",
-  "CBTIS 191 Calvillo",
-  "Preparatoria Regional de Calvillo",
-  "Universidad / superior en Calvillo",
-  "Otra escuela de Calvillo",
+  { value: "Primaria de Calvillo", abrev: "prim" },
+  { value: "Secundaria de Calvillo", abrev: "sec" },
+  { value: "CBTIS 191 Calvillo", abrev: "cbtis" },
+  { value: "CBTA 61 Calvillo", abrev: "cbta" },
+  { value: "Preparatoria Regional de Calvillo", abrev: "prepa" },
+  { value: "Universidad Tecnológica de Calvillo", abrev: "utc" },
+  { value: "Otra escuela de Calvillo", abrev: "esc" },
 ];
 const GRADOS = [
   "1er semestre", "2do semestre", "3er semestre", "4to semestre",
@@ -464,7 +465,7 @@ export default function Solicitud() {
           </div>
           <Field label="Correo electrónico" icon={Mail}><input required type="email" value={form.correo} onChange={(e) => setF("correo", e.target.value)} style={inputStyle(fieldErrors.correo)} /></Field>
           <Field label="Institución educativa" icon={GraduationCap}>
-            <Select value={form.escuela} onChange={(e) => setF("escuela", e.target.value)} options={ESCUELAS} placeholder="Selecciona" />
+            <Select value={form.escuela} onChange={(e) => setF("escuela", e.target.value)} options={ESCUELAS.map((e) => typeof e === "string" ? e : e.value)} placeholder="Selecciona" />
           </Field>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
             <Field label="Carrera / especialidad"><input required value={form.carrera} onChange={(e) => setF("carrera", e.target.value)} style={inputStyle()} /></Field>
@@ -472,7 +473,7 @@ export default function Solicitud() {
               <Select value={form.grado} onChange={(e) => setF("grado", e.target.value)} options={GRADOS} placeholder="Grado" />
             </Field>
           </div>
-          <Field label="Número de estudiante"><input required value={form.matricula} onChange={(e) => setF("matricula", e.target.value)} style={inputStyle()} className="f-mono" placeholder="El que use tu escuela (no hace falta que sea UPA)" /></Field>
+          <Field label="Número de estudiante"><input required value={form.matricula} onChange={(e) => setF("matricula", e.target.value.toLowerCase().replace(/\s/g, ""))} style={inputStyle()} className="f-mono" placeholder="Ej. cbtis2024, cbta2023, utc2025, prepa2024…" /><div style={{ fontSize: 11, color: "#8993A1", marginTop: 4 }}>Usa la abreviatura de tu escuela + año o folio (ej. <span className="f-mono">cbta2023</span>, <span className="f-mono">utc2024</span>). No uses prefijos UPA.</div></Field>
           <Field label="Foto del estudiante (obligatoria)" icon={Camera}>
             {foto ? (
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

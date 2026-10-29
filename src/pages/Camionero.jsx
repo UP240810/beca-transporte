@@ -788,18 +788,51 @@ export default function Camionero() {
           </div>
           {rep && (
             <div style={{ marginTop: 12 }}>
-              <div style={{ fontSize: 14 }}>Viajes: <b>{rep.viajes}</b> · Total 90%: <b>${rep.total90}</b></div>
-              {rep.filas?.length > 0 && (
-                <Btn variant="excel" icon={FileSpreadsheet} style={{ minHeight: 40, fontSize: 14, marginTop: 10 }} onClick={() => descargarExcel(`reporte_chofer_${rep.desde}_a_${rep.hasta}`, [{
-                  nombre: "Viajes",
-                  titulo: `Reporte de viajes ${rep.desde} → ${rep.hasta}`,
-                  columnas: [
-                    { h: "Fecha", k: "fecha", ancho: 18 }, { h: "Matrícula", k: "idEstudiante", ancho: 16 }, { h: "Estudiante", k: "nombre", ancho: 30 },
-                    { h: "Unidad", k: "unidad", ancho: 10 }, { h: "ID Viaje", k: "idViaje", tipo: "numero", ancho: 10 }, { h: "Ruta", k: "ruta", ancho: 32 }, { h: "90%", k: "costo90", tipo: "moneda", ancho: 12 },
-                  ],
-                  filas: rep.filas.map((f) => ({ ...f, fecha: String(f.fecha).slice(0, 16), unidad: f.unidad || "—" })),
-                  totales: { costo90: rep.total90 },
-                }])}>Exportar a Excel</Btn>
+              <div style={{ fontSize: 14 }}>Viajes: <b>{rep.viajes}</b> · Total 90%: <b>${rep.total90}</b>
+                {rep.total100 != null && <> · Boleto 100%: <b>${rep.total100}</b></>}
+              </div>
+              {rep.filas?.length > 0 ? (
+                <>
+                  <div style={{ marginTop: 12, border: `1px solid ${C.paperDim}`, borderRadius: 10, overflow: "hidden" }}>
+                    <div style={{ maxHeight: 320, overflowY: "auto" }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
+                        <thead>
+                          <tr style={{ background: C.navy, color: "#fff", textAlign: "left" }}>
+                            <th style={{ padding: "8px 10px", fontWeight: 600 }}>Fecha</th>
+                            <th style={{ padding: "8px 10px", fontWeight: 600 }}>Estudiante</th>
+                            <th style={{ padding: "8px 10px", fontWeight: 600 }}>Ruta</th>
+                            <th style={{ padding: "8px 10px", fontWeight: 600, textAlign: "right" }}>90%</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {rep.filas.map((f, i) => (
+                            <tr key={i} style={{ borderTop: `1px solid ${C.paperDim}`, background: i % 2 ? "#F8FAFC" : "#fff" }}>
+                              <td style={{ padding: "8px 10px", whiteSpace: "nowrap" }} className="f-mono">{String(f.fecha).slice(0, 16)}</td>
+                              <td style={{ padding: "8px 10px" }}>
+                                <div style={{ fontWeight: 600, color: C.navy }}>{f.nombre || "—"}</div>
+                                <div className="f-mono" style={{ fontSize: 11, color: "#8993A1" }}>{f.idEstudiante || f.matricula || ""}}</div>
+                              </td>
+                              <td style={{ padding: "8px 10px" }}>{f.ruta || "—"}</td>
+                              <td style={{ padding: "8px 10px", textAlign: "right" }} className="f-mono">${f.costo90 ?? 0}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  <Btn variant="excel" icon={FileSpreadsheet} style={{ minHeight: 40, fontSize: 14, marginTop: 10 }} onClick={() => descargarExcel(`reporte_chofer_${rep.desde}_a_${rep.hasta}`, [{
+                    nombre: "Viajes",
+                    titulo: `Reporte de viajes ${rep.desde} → ${rep.hasta}`,
+                    columnas: [
+                      { h: "Fecha", k: "fecha", ancho: 18 }, { h: "No. estudiante", k: "idEstudiante", ancho: 16 }, { h: "Estudiante", k: "nombre", ancho: 30 },
+                      { h: "Unidad", k: "unidad", ancho: 10 }, { h: "ID Viaje", k: "idViaje", tipo: "numero", ancho: 10 }, { h: "Ruta", k: "ruta", ancho: 32 }, { h: "90%", k: "costo90", tipo: "moneda", ancho: 12 },
+                    ],
+                    filas: rep.filas.map((f) => ({ ...f, fecha: String(f.fecha).slice(0, 16), unidad: f.unidad || "—" })),
+                    totales: { costo90: rep.total90 },
+                  }])}>Exportar a Excel (opcional)</Btn>
+                </>
+              ) : (
+                <div style={{ marginTop: 10, fontSize: 13, color: "#8993A1" }}>No hay viajes en ese rango de fechas.</div>
               )}
             </div>
           )}

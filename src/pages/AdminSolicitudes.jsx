@@ -488,7 +488,7 @@ function DetalleSolicitud({ solicitud, token, onBack, onActualizado }) {
             <DetalleRow icon={GraduationCap} label="Escuela" value={solicitud.escuela} />
             <DetalleRow icon={GraduationCap} label="Carrera" value={solicitud.carrera} />
             <DetalleRow icon={GraduationCap} label="Grado" value={solicitud.grado} />
-            <DetalleRow icon={User} label="Matrícula" value={solicitud.matricula} />
+            <DetalleRow icon={User} label="No. estudiante" value={solicitud.matricula} />
           </div>
 
           <div style={{ background: "#fff", border: `1px solid ${C.paperDim}`, borderRadius: 12, padding: 14, marginBottom: 18 }}>
@@ -536,7 +536,7 @@ function DetalleSolicitud({ solicitud, token, onBack, onActualizado }) {
               <textarea
                 value={motivo}
                 onChange={(e) => setMotivo(e.target.value)}
-                placeholder="Ej. La matrícula no coincide con el formato registrado por la escuela."
+                placeholder="Ej. El número de estudiante no coincide con el formato de la escuela (cbta/cbtis/utc…)."
                 rows={3}
                 style={{ width: "100%", border: `1px solid ${C.paperDim}`, borderRadius: 9, padding: 10, fontSize: 12.5, boxSizing: "border-box", resize: "none", outline: "none" }}
               />
