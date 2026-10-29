@@ -529,7 +529,7 @@ export default function Camionero() {
             </div>
             <div style={{ fontSize: 13, opacity: 0.9, display: "flex", justifyContent: "space-between", padding: "6px 0", borderTop: "1px solid rgba(255,255,255,0.2)" }}>
               <span>Ruta del pase</span>
-              <strong>{(resultado.alumno?.rutas || [resultado.alumno?.ruta]).filter(Boolean).join(" · ") || "—"}</strong>
+              <strong>{(resultado.alumno?.rutas || [resultado.alumno?.ruta]).filter(Boolean).join(" · ") || "-"}</strong>
             </div>
             <div style={{ fontSize: 13, opacity: 0.9, display: "flex", justifyContent: "space-between", padding: "6px 0", borderTop: "1px solid rgba(255,255,255,0.2)" }}>
               <span>Viajes restantes</span>
@@ -809,11 +809,11 @@ export default function Camionero() {
                             <tr key={i} style={{ borderTop: `1px solid ${C.paperDim}`, background: i % 2 ? "#F8FAFC" : "#fff" }}>
                               <td style={{ padding: "8px 10px", whiteSpace: "nowrap" }} className="f-mono">{String(f.fecha).slice(0, 16)}</td>
                               <td style={{ padding: "8px 10px" }}>
-                                <div style={{ fontWeight: 600, color: C.navy }}>{f.nombre || "—"}</div>
-                                <div className="f-mono" style={{ fontSize: 11, color: "#8993A1" }}>{f.idEstudiante || f.matricula || "—"}}</div>
+                                <div style={{ fontWeight: 600, color: C.navy }}>{f.nombre || "-"}</div>
+                                <div className="f-mono" style={{ fontSize: 11, color: "#8993A1" }}>{(f.idEstudiante || f.matricula || "-")}}</div>
                               </td>
-                              <td style={{ padding: "8px 10px" }}>{f.ruta || "—"}</td>
-                              <td style={{ padding: "8px 10px", textAlign: "right" }} className="f-mono">${f.costo90 ?? 0}</td>
+                              <td style={{ padding: "8px 10px" }}>{f.ruta || "-"}</td>
+                              <td style={{ padding: "8px 10px", textAlign: "right" }} className="f-mono">{"$" + (f.costo90 ?? 0)}</td>
                             </tr>
                           ))}
                         </tbody>
